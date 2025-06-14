@@ -38,7 +38,6 @@ int main() {
 
 
     Cloud cloud;
-    // cloud.setRange(WIDTH / 2, HEIGHT / 2);
     cloud.newParticles(10000);
 
     // basic loop
@@ -47,13 +46,8 @@ int main() {
         glClear(GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT); // clear scene
 
         // print particles
+        cloud.updatePos();
         cloud.print();
-        // glColor3f(1.0f, 1.0f, 1.0f);
-        // glBegin(GL_TRIANGLES);
-        // glVertex2f(-1.0f, -1.0f); // Нижня ліва вершина
-        // glVertex2f( 0.5f, -0.5f); // Нижня права вершина
-        // glVertex2f( 0.0f,  0.5f); // Верхня вершина (центр)
-        // glEnd();
 
         // other
         glfwSwapBuffers(window);

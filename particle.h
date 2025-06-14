@@ -9,16 +9,13 @@ class Particle
         xyz_t speed;
     
     public:
-        void setPos(xyz_t pos) {
-            this->pos = pos;
-        }
+        void setPos(xyz_t pos);
+        void setSpeed(xyz_t speed);
 
-        void setSpeed(xyz_t speed) {
-            this->speed = speed;
-        }
+        float getX();
+        float getY();
 
-        float getX() { return pos.x; }
-        float getY() { return pos.y; }
+        void updatePos();
 
         Particle(xyz_t pos, xyz_t speed) 
         : pos(pos), speed(speed)
