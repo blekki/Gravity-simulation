@@ -8,6 +8,10 @@ void Particle::setSpeed(xyz_t speed) {
     this->speed = speed;
 }
 
+void Particle::addSpeed(xyz_t speed) {
+    this->speed += speed;
+}
+
 float Particle::getX() { return pos.x; }
 float Particle::getY() { return pos.y; }
 

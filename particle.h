@@ -1,3 +1,4 @@
+#pragma once
 #include "xyz_t.h"
 
 using namespace std;
@@ -11,6 +12,7 @@ class Particle
     public:
         void setPos(xyz_t pos);
         void setSpeed(xyz_t speed);
+        void addSpeed(xyz_t speed);
 
         float getX();
         float getY();

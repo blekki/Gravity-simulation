@@ -38,7 +38,7 @@ int main() {
 
 
     Cloud cloud;
-    cloud.newParticles(10000);
+    cloud.newParticles(10);
 
     // basic loop
     while (!glfwWindowShouldClose(window)) {
