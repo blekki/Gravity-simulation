@@ -24,6 +24,7 @@ class Node
         uint mass;
 
         uint level; // nestedness level
+        const uint NESTEDNESS = 8;
     
     public:
         void setCanvasSize(xyz_t x1y1, xyz_t x2y2) {
@@ -32,7 +33,6 @@ class Node
         }
 
         uint split(vector<Particle> particles) {
-            // cout << "*";
             if (particles.size() == 0) // space without particles
                 return 0;
             if (particles.size() == 1) // space with only one particle
@@ -58,40 +58,40 @@ class Node
             }
 
             // create the nodes and get a mass sum
-            const uint NODE_COUNT = 4;
-            xyz_t half = (x2y2 - x1y1) / 2;
-            xyz_t canvas[4][2] = {{xyz_t(x1y1.x, x1y1.y, 0), xyz_t(x1y1.x + half.x, x1y1.y + half.y, 0)},
-                                  {xyz_t(x1y1.x, x1y1.y + half.y, 0), xyz_t(x1y1.x + half.x, x2y2.y, 0)},
-                                  {xyz_t(x1y1.x + half.x, x1y1.y, 0), xyz_t(x2y2.x, x1y1.y + half.y, 0)},
-                                  {xyz_t(x1y1.x + half.x, x1y1.y + half.y, 0), xyz_t(x2y2.x, x2y2.y, 0)}};
-            for (uint a = 0; a < NODE_COUNT; a++) {
-                if (region[a].size() > 0) {
-                    // cout << "s";
-                    node[a] = make_unique<Node>(); // create a new node
-                    node[a]->setCanvasSize(canvas[a][0], canvas[a][1]);
-                    this->mass += node[a]->split(region[a]); // recursion split a node to the smaller nodes
-                    // cout << " " << endl;
+            if (level < NESTEDNESS) {
+                const uint NODE_COUNT = 4;
+                xyz_t half = (x2y2 - x1y1) / 2;
+                xyz_t canvas[4][2] = {{xyz_t(x1y1.x, x1y1.y, 0), xyz_t(x1y1.x + half.x, x1y1.y + half.y, 0)},
+                                    {xyz_t(x1y1.x, x1y1.y + half.y, 0), xyz_t(x1y1.x + half.x, x2y2.y, 0)},
+                                    {xyz_t(x1y1.x + half.x, x1y1.y, 0), xyz_t(x2y2.x, x1y1.y + half.y, 0)},
+                                    {xyz_t(x1y1.x + half.x, x1y1.y + half.y, 0), xyz_t(x2y2.x, x2y2.y, 0)}};
+                for (uint a = 0; a < NODE_COUNT; a++) {
+                    if (region[a].size() > 0) {
+                        node[a] = make_unique<Node>(level + 1); // create a new node
+                        node[a]->setCanvasSize(canvas[a][0], canvas[a][1]);
+                        this->mass += node[a]->split(region[a]); // recursion split a node to the smaller nodes
+                        printsq(canvas[a][0], canvas[a][1]);
+                    }
                 }
             }
-            printsq(x1y1, x2y2);
             return this->mass;
         }
 
-        void printsq(xyz_t pos1, xyz_t pos2) {
+        void printsq(xyz_t x1y1, xyz_t x2y2) { // todo: remove
             const uint VALUE_RANGE = 1000000;
-            pos1 = pos1 / (VALUE_RANGE * 1.0f);
-            pos2 = pos2 / (VALUE_RANGE * 1.0f);
-            glColor3f(1.0f, 0.0f, 0.0f);
-            glBegin(GL_LINES);
-            glVertex2f(pos1.x, pos1.y);
-            glVertex2f(pos1.x, pos2.y);
-            glVertex2f(pos2.x, pos2.y);
-            glVertex2f(pos2.x, pos1.y);
-            glVertex2f(pos1.x, pos1.y);
+            x1y1 = x1y1 / (VALUE_RANGE * 1.0f);
+            x2y2 = x2y2 / (VALUE_RANGE * 1.0f);
+            glColor3f(0.9f, 3.0f, 2.0f);
+            glBegin(GL_LINE_STRIP);
+            glVertex2f(x1y1.x, x1y1.y);
+            glVertex2f(x1y1.x, x2y2.y);
+            glVertex2f(x2y2.x, x2y2.y);
+            glVertex2f(x2y2.x, x1y1.y);
+            glVertex2f(x1y1.x, x1y1.y);
             glEnd();
         }
 
-        Node(uint level) 
+        Node(uint level)
         : mass(0), level(level)
         {}
 };

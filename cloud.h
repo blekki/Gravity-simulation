@@ -15,8 +15,9 @@ class Cloud
         vector<Particle> particles;
         
         // range where particles can be created
-        const int VALUE_RANGE = 10; // 1000000; // 1M km from centre
+        const int VALUE_RANGE = 1000000; // 1000000; // 1M km from centre
         const int SPEED_RANGE = 1000;
+        const int PARTICLE_COUNT = 400;
 
         void printsq(xyz_t pos1, xyz_t pos2);
 
@@ -26,7 +27,7 @@ class Cloud
     public:
 
         // create a new pack dust particles
-        void newParticles(uint count);
+        void newParticles();
         void updatePos();
         void print();
 

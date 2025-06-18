@@ -38,7 +38,7 @@ int main() {
 
 
     Cloud cloud;
-    cloud.newParticles(400);
+    cloud.newParticles();
     cloud.print();
     glfwSwapBuffers(window);
 

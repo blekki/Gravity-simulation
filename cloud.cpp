@@ -4,8 +4,8 @@
 #include "cloud.h"
 #include "massPoint.h"
 
-void Cloud::newParticles(uint count) {
-    for (uint i = 0; i < count; i++) {
+void Cloud::newParticles() {
+    for (uint i = 0; i < PARTICLE_COUNT; i++) {
         // position in the space
         float x = rand() % VALUE_RANGE * 2.0f - VALUE_RANGE;
         float y = rand() % VALUE_RANGE * 2.0f - VALUE_RANGE;
