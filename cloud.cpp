@@ -32,7 +32,7 @@ void Cloud::printsq(xyz_t pos1, xyz_t pos2) {
     glEnd();
 }
 
-void Cloud::updatePos() {
+void Cloud::updatePos1() {
     // a lamda function for finding a quadtree
     function<MassPoint(vector<Particle>, xyz_t, xyz_t)> quadtree;
     
@@ -108,6 +108,18 @@ void Cloud::updatePos() {
         particles[i].addSpeed(xyz_t(x, y, 0));
         particles[i].updatePos();
     }
+}
+
+void Cloud::updatePos() {
+    this->node = make_unique<Node>(0);
+    this->node->setCanvasSize(xyz_t(-VALUE_RANGE, -VALUE_RANGE, 0), xyz_t(VALUE_RANGE, VALUE_RANGE, 0));
+    this->node->split(particles);
+
+    // for (uint i = 0; i < particles.size(); i++) {
+        // find distance
+        // calculate power
+        // calculate speed vec
+    // }
 }
 
 void Cloud::print() {

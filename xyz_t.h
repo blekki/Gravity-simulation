@@ -12,6 +12,14 @@ struct xyz_t
         this->z += other.z;
     }
 
+    xyz_t operator+(xyz_t other) {
+        xyz_t current;
+        current.x = this->x + other.x;
+        current.y = this->y + other.y;
+        current.z = this->z + other.z;
+        return current;
+    }
+
     xyz_t operator-(xyz_t other) {
         xyz_t current;
         current.x = this->x - other.x;

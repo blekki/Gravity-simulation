@@ -18,7 +18,7 @@ static void key_callback(GLFWwindow *window, int key, int scancode, int action, 
 }
 
 int main() {
-    srand(time(0));
+    // srand(time(0));
     // glfw initialization
     if (!glfwInit()) {
         cout << "Initialization failed" << endl;
@@ -38,7 +38,9 @@ int main() {
 
 
     Cloud cloud;
-    cloud.newParticles(10);
+    cloud.newParticles(400);
+    cloud.print();
+    glfwSwapBuffers(window);
 
     // basic loop
     while (!glfwWindowShouldClose(window)) {
@@ -48,6 +50,8 @@ int main() {
         // print particles
         cloud.updatePos();
         cloud.print();
+
+        // break;
 
         // other
         glfwSwapBuffers(window);
