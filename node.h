@@ -16,19 +16,18 @@ using namespace std;
 class Node
 {
     private:
+        // about field
         unique_ptr<Node> node[4];
-        
-        // field size
         xyz_t x1y1;
         xyz_t x2y2;
-        // field sum mass
-        float mass;
+        // other
+        // uint particle_count = 0;
+        uint level; // current nestedness level
+        vector<unique_ptr<Particle>> particels;
 
-        uint particle_count = 0;
-
-        uint level; // nestedness level
-        const uint NESTEDNESS = 8; // max level
-        const int COEF = 4.0f; // coef of (size / dist)
+        static const uint NESTEDNESS = 8; // max level
+        static const int COEF = 3.0f; // coef of (size / dist)
+        static constexpr float PARTICLE_MASS = 1E10;
 
     public:
         void setCanvasSize(xyz_t x1y1, xyz_t x2y2) {
@@ -44,35 +43,36 @@ class Node
 
         xyz_t gravityVec(xyz_t pos) { // todo: make parameter a pointer on particle
             // canvas
-            float s = distCube(x2y2, x1y1); // right now sq
+            float s = sqrt(distCube(x2y2, x1y1)); // right now sq
             xyz_t centre = (x2y2 - x1y1) / 2 + x1y1;
-            float r = distCube(centre, pos); // right now sq
+            float r = sqrt(distCube(centre, pos)); // right now sq
 
             // gravity
-            float G = 6.6742E-11;
-            float gravity = (G * pow(mass, 2)) / pow(r, 2);
+            // float G = 6.6742E-11;
+            // float gravity = (G * pow(mass, 2)) / pow(r, 2);
 
             // xyz_t dist = centre - pos;
             // float k = dist.x / dist.y;
             // xyz_t vec(gravity * k, gravity / k, 0);
-            // return vec;
+            // return vec;ount == 1) {
 
-            xyz_t vec(0, 0, 0);
-            if (s / r > COEF) {
+            xyz_t gravity_vec(0, 0, 0);
+            if (r / s > COEF || particels.size() == 1) {
+                float G = 6.6742E-11;
+                float gravity = (G * pow(PARTICLE_MASS, 2) * (particels.size())) / (r * r);
                 xyz_t dist = centre - pos;
                 float k = dist.x / dist.y;
-                vec = xyz_t(gravity * k, gravity / k, 0);
-                return vec;
+                gravity_vec = xyz_t(gravity * k, gravity / k, 0);
             }
-            return vec;
-            // else {
-            //     for (uint a = 0; a < 4; a++) {
-            //         if (node[a])
-            //             speed += node[a]->influence(pos);
-            //     }
-            // }
+            else {
+                for (uint a = 0; a < 4; a++) {
+                    if (node[a]) {
+                        gravity_vec += node[a]->gravityVec(pos);
+                    }
+                }
+            }
 
-            // return speed;
+            return gravity_vec;
         }
 
         uint split(vector<Particle> particles) {
@@ -111,19 +111,19 @@ class Node
                     if (region[a].size() > 0) {
                         node[a] = make_unique<Node>(level + 1); // create a new node
                         node[a]->setCanvasSize(canvas[a][0], canvas[a][1]);
-                        this->mass += node[a]->split(region[a]); // recursion split a node to the smaller nodes
+                        this->particle_count += node[a]->split(region[a]); // recursion split a node to the smaller nodes
                         printsq(canvas[a][0], canvas[a][1]);
                     }
                 }
             }
-            return this->mass;
+            return this->particle_count;
         }
 
         void printsq(xyz_t x1y1, xyz_t x2y2) { // todo: remove
             const uint VALUE_RANGE = 1000000;
             x1y1 = x1y1 / (VALUE_RANGE * 1.0f);
             x2y2 = x2y2 / (VALUE_RANGE * 1.0f);
-            glColor3f(0.9f, 3.0f, 2.0f);
+            glColor3f(0.3f, 0.3f, 0.3f);
             glBegin(GL_LINE_STRIP);
             glVertex2f(x1y1.x, x1y1.y);
             glVertex2f(x1y1.x, x2y2.y);
@@ -134,6 +134,6 @@ class Node
         }
 
         Node(uint level)
-        : mass(1E15), level(level) // mass(1E13)
+        : level(level)
         {}
 };
