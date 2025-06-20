@@ -23,11 +23,12 @@ class Node
         // other
         // uint particle_count = 0;
         uint level; // current nestedness level
-        vector<unique_ptr<Particle>> particels;
+
+        Particle mass_centre;
 
         static const uint NESTEDNESS = 8; // max level
-        static const int COEF = 3.0f; // coef of (size / dist)
-        static constexpr float PARTICLE_MASS = 1E10;
+        static constexpr float COEF = 3.0f; // coef of (size / dist)
+        // static constexpr float PARTICLE_MASS = 1E10;
 
     public:
         void setCanvasSize(xyz_t x1y1, xyz_t x2y2) {
@@ -41,33 +42,33 @@ class Node
             return result;
         }
 
-        xyz_t gravityVec(xyz_t pos) { // todo: make parameter a pointer on particle
+        xyz_t gravityVec(Particle* particle) { // todo: make parameter a pointer on particle
+            // xyz_t centre = (x2y2 - x1y1) / 2 + x1y1;
+
             // canvas
             float s = sqrt(distCube(x2y2, x1y1)); // right now sq
-            xyz_t centre = (x2y2 - x1y1) / 2 + x1y1;
-            float r = sqrt(distCube(centre, pos)); // right now sq
+            xyz_t centre = mass_centre.getXYZ();
+            float r = sqrt(distCube(centre, particle->getXYZ())); // right now sq
 
-            // gravity
-            // float G = 6.6742E-11;
-            // float gravity = (G * pow(mass, 2)) / pow(r, 2);
-
-            // xyz_t dist = centre - pos;
-            // float k = dist.x / dist.y;
-            // xyz_t vec(gravity * k, gravity / k, 0);
-            // return vec;ount == 1) {
+            bool last_level = false;
+            for (uint a = 0; a < 4; a++)
+                if (!node[a])
+                    last_level = true;
 
             xyz_t gravity_vec(0, 0, 0);
-            if (r / s > COEF || particels.size() == 1) {
+            if (r / s > COEF || last_level) {
                 float G = 6.6742E-11;
-                float gravity = (G * pow(PARTICLE_MASS, 2) * (particels.size())) / (r * r);
-                xyz_t dist = centre - pos;
+                float gravity = (G * particle->getMass() * mass_centre.getMass()) / (r * r);
+
+                xyz_t dist = centre - particle->getXYZ();
                 float k = dist.x / dist.y;
+                // if (k) k += 1E-3;
                 gravity_vec = xyz_t(gravity * k, gravity / k, 0);
             }
             else {
                 for (uint a = 0; a < 4; a++) {
                     if (node[a]) {
-                        gravity_vec += node[a]->gravityVec(pos);
+                        gravity_vec += node[a]->gravityVec(particle);
                     }
                 }
             }
@@ -75,11 +76,15 @@ class Node
             return gravity_vec;
         }
 
-        uint split(vector<Particle> particles) {
-            if (particles.size() == 0) // space without particles
-                return 0;
-            if (particles.size() == 1) // space with only one particle
-                return 1;
+        float split(vector<Particle> particles) {
+            if (particles.size() == 0) { // space without particles
+                mass_centre = Particle(xyz_t(0, 0, 0), xyz_t(0, 0, 0), 0.0f);
+                return 0.0f;
+            }
+            if (particles.size() == 1) { // space with only one particle
+                mass_centre = particles[0];
+                return particles[0].getMass();
+            } 
 
             // find where are particles
             vector<Particle> region[4];
@@ -101,6 +106,7 @@ class Node
             }
 
             // create the nodes and get a mass sum
+            float sum_mass = 0.0f;
             if (level < NESTEDNESS) {
                 xyz_t half = (x2y2 - x1y1) / 2;
                 xyz_t canvas[4][2] = {{xyz_t(x1y1.x, x1y1.y, 0), xyz_t(x1y1.x + half.x, x1y1.y + half.y, 0)},
@@ -111,12 +117,13 @@ class Node
                     if (region[a].size() > 0) {
                         node[a] = make_unique<Node>(level + 1); // create a new node
                         node[a]->setCanvasSize(canvas[a][0], canvas[a][1]);
-                        this->particle_count += node[a]->split(region[a]); // recursion split a node to the smaller nodes
-                        printsq(canvas[a][0], canvas[a][1]);
+                        sum_mass += node[a]->split(region[a]); // recursion split a node to the smaller nodes
+                        // printsq(canvas[a][0], canvas[a][1]);
                     }
                 }
             }
-            return this->particle_count;
+            mass_centre = Particle((x2y2 - x1y1) / 2 + x1y1, xyz_t(0, 0, 0), sum_mass);
+            return sum_mass;
         }
 
         void printsq(xyz_t x1y1, xyz_t x2y2) { // todo: remove

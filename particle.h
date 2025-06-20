@@ -8,6 +8,7 @@ class Particle
     private:
         xyz_t pos;
         xyz_t speed;
+        float mass;
     
     public:
         void setPos(xyz_t pos);
@@ -17,10 +18,17 @@ class Particle
         float getX();
         float getY();
         xyz_t getXYZ();
+        float getMass();
 
         void updatePos();
 
         Particle(xyz_t pos, xyz_t speed) 
-        : pos(pos), speed(speed)
+        : pos(pos), speed(speed), mass(1E9)
         {}
+
+        Particle(xyz_t pos, xyz_t speed, float mass) 
+        : pos(pos), speed(speed), mass(mass)
+        {}
+
+        Particle(){}
 };

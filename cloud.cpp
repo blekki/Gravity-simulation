@@ -117,7 +117,7 @@ void Cloud::updatePos() {
 
     for (uint i = 0; i < particles.size(); i++) {
         xyz_t pos = particles[i].getXYZ();
-        particles[i].addSpeed(node->gravityVec(pos));
+        particles[i].addSpeed(node->gravityVec(&particles[i]));
         particles[i].updatePos();
 
         // for (uint b = 0; b < particles.size(); b++) {

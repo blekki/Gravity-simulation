@@ -16,6 +16,8 @@ float Particle::getX() { return pos.x; }
 float Particle::getY() { return pos.y; }
 xyz_t Particle::getXYZ() { return pos; }
 
+float Particle::getMass() {return mass; };
+
 void Particle::updatePos() {
     pos += speed;
 }
