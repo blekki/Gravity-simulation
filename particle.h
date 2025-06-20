@@ -18,6 +18,7 @@ class Particle
         float getX();
         float getY();
         xyz_t getXYZ();
+        xyz_t getSpeed();
         float getMass();
 
         void updatePos();

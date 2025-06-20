@@ -11,6 +11,8 @@
 
 #include "iostream" // todo: remove
 
+#include <unistd.h>
+
 using namespace std;
 
 class Node
@@ -27,7 +29,7 @@ class Node
         Particle mass_centre;
 
         static const uint NESTEDNESS = 8; // max level
-        static constexpr float COEF = 3.0f; // coef of (size / dist)
+        static constexpr float COEF = 1.0f; // coef of (size / dist)
         // static constexpr float PARTICLE_MASS = 1E10;
 
     public:
@@ -38,17 +40,18 @@ class Node
 
         float distCube(xyz_t from, xyz_t to) {
             xyz_t dist = to - from;
+            // cout << "to:   " << x1y1.x << " : " << x1y1.y << endl;
+            // cout << "from: " << from.x << " : " << from.y << endl;
             float result = (dist.x*dist.x) + (dist.y*dist.y);// + (dist.z*dist.z);
-            return result;
+            return sqrt(result);
         }
 
         xyz_t gravityVec(Particle* particle) { // todo: make parameter a pointer on particle
-            // xyz_t centre = (x2y2 - x1y1) / 2 + x1y1;
-
             // canvas
-            float s = sqrt(distCube(x2y2, x1y1)); // right now sq
-            xyz_t centre = mass_centre.getXYZ();
-            float r = sqrt(distCube(centre, particle->getXYZ())); // right now sq
+            float s = distCube(x2y2, x1y1); // right now sq
+            float r = distCube(mass_centre.getXYZ(), particle->getXYZ()); // right now sq
+
+            println(particle->getXYZ(), mass_centre.getXYZ());
 
             bool last_level = false;
             for (uint a = 0; a < 4; a++)
@@ -58,11 +61,12 @@ class Node
             xyz_t gravity_vec(0, 0, 0);
             if (r / s > COEF || last_level) {
                 float G = 6.6742E-11;
-                float gravity = (G * particle->getMass() * mass_centre.getMass()) / (r * r);
+                double gravity = (G * particle->getMass() * mass_centre.getMass()) / (r * r);
+                if (isnan(gravity))
+                    exit(0);
 
-                xyz_t dist = centre - particle->getXYZ();
+                xyz_t dist = mass_centre.getXYZ() - particle->getXYZ();
                 float k = dist.x / dist.y;
-                // if (k) k += 1E-3;
                 gravity_vec = xyz_t(gravity * k, gravity / k, 0);
             }
             else {
@@ -118,7 +122,7 @@ class Node
                         node[a] = make_unique<Node>(level + 1); // create a new node
                         node[a]->setCanvasSize(canvas[a][0], canvas[a][1]);
                         sum_mass += node[a]->split(region[a]); // recursion split a node to the smaller nodes
-                        // printsq(canvas[a][0], canvas[a][1]);
+                        printsq(canvas[a][0], canvas[a][1]);
                     }
                 }
             }
@@ -127,16 +131,28 @@ class Node
         }
 
         void printsq(xyz_t x1y1, xyz_t x2y2) { // todo: remove
-            const uint VALUE_RANGE = 1000000;
-            x1y1 = x1y1 / (VALUE_RANGE * 1.0f);
-            x2y2 = x2y2 / (VALUE_RANGE * 1.0f);
-            glColor3f(0.3f, 0.3f, 0.3f);
+            const float VALUE_RANGE = 1000000.0f;
+            x1y1 = x1y1 / VALUE_RANGE;
+            x2y2 = x2y2 / VALUE_RANGE;
+            const float light = 0.2f;
+            glColor3f(light, light, light);
             glBegin(GL_LINE_STRIP);
             glVertex2f(x1y1.x, x1y1.y);
             glVertex2f(x1y1.x, x2y2.y);
             glVertex2f(x2y2.x, x2y2.y);
             glVertex2f(x2y2.x, x1y1.y);
             glVertex2f(x1y1.x, x1y1.y);
+            glEnd();
+        }
+
+        void println(xyz_t from, xyz_t to) {
+            const float VALUE_RANGE = 1000000.0f;
+            from = from / VALUE_RANGE;
+            to = to / VALUE_RANGE;
+            glColor3f(1.0f, 0.0f, 0.0f);
+            glBegin(GL_LINES);
+            glVertex2f(from.x, from.y);
+            glVertex2f(to.x, to.y);
             glEnd();
         }
 

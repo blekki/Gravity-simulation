@@ -18,7 +18,7 @@ static void key_callback(GLFWwindow *window, int key, int scancode, int action, 
 }
 
 int main() {
-    srand(time(0));
+    // srand(time(0));
     // glfw initialization
     if (!glfwInit()) {
         cout << "Initialization failed" << endl;
