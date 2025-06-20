@@ -113,13 +113,22 @@ void Cloud::updatePos1() {
 void Cloud::updatePos() {
     this->node = make_unique<Node>(0);
     this->node->setCanvasSize(xyz_t(-VALUE_RANGE, -VALUE_RANGE, 0), xyz_t(VALUE_RANGE, VALUE_RANGE, 0));
-    this->node->split(particles);
+    // this->node->split(particles);
 
-    // for (uint i = 0; i < particles.size(); i++) {
+    for (uint i = 0; i < particles.size(); i++) {
+        xyz_t pos = particles[i].getXYZ();
+        particles[i].addSpeed(node->gravityVec(pos));
+        particles[i].updatePos();
+
+        // for (uint b = 0; b < particles.size(); b++) {
+        //     if (i == b) continue;
+            
+        // }
+
         // find distance
         // calculate power
         // calculate speed vec
-    // }
+    }
 }
 
 void Cloud::print() {

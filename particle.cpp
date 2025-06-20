@@ -14,6 +14,7 @@ void Particle::addSpeed(xyz_t speed) {
 
 float Particle::getX() { return pos.x; }
 float Particle::getY() { return pos.y; }
+xyz_t Particle::getXYZ() { return pos; }
 
 void Particle::updatePos() {
     pos += speed;

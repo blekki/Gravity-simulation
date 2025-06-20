@@ -16,6 +16,7 @@ class Particle
 
         float getX();
         float getY();
+        xyz_t getXYZ();
 
         void updatePos();
 

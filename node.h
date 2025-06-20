@@ -4,6 +4,7 @@
 #include <GL/gl.h>
 #include "vector"
 #include "memory"
+#include "math.h"
 
 #include "particle.h"
 #include "xyz_t.h"
@@ -21,15 +22,57 @@ class Node
         xyz_t x1y1;
         xyz_t x2y2;
         // field sum mass
-        uint mass;
+        float mass;
+
+        uint particle_count = 0;
 
         uint level; // nestedness level
-        const uint NESTEDNESS = 8;
-    
+        const uint NESTEDNESS = 8; // max level
+        const int COEF = 4.0f; // coef of (size / dist)
+
     public:
         void setCanvasSize(xyz_t x1y1, xyz_t x2y2) {
             this->x1y1 = x1y1;
             this->x2y2 = x2y2;
+        }
+
+        float distCube(xyz_t from, xyz_t to) {
+            xyz_t dist = to - from;
+            float result = (dist.x*dist.x) + (dist.y*dist.y);// + (dist.z*dist.z);
+            return result;
+        }
+
+        xyz_t gravityVec(xyz_t pos) { // todo: make parameter a pointer on particle
+            // canvas
+            float s = distCube(x2y2, x1y1); // right now sq
+            xyz_t centre = (x2y2 - x1y1) / 2 + x1y1;
+            float r = distCube(centre, pos); // right now sq
+
+            // gravity
+            float G = 6.6742E-11;
+            float gravity = (G * pow(mass, 2)) / pow(r, 2);
+
+            // xyz_t dist = centre - pos;
+            // float k = dist.x / dist.y;
+            // xyz_t vec(gravity * k, gravity / k, 0);
+            // return vec;
+
+            xyz_t vec(0, 0, 0);
+            if (s / r > COEF) {
+                xyz_t dist = centre - pos;
+                float k = dist.x / dist.y;
+                vec = xyz_t(gravity * k, gravity / k, 0);
+                return vec;
+            }
+            return vec;
+            // else {
+            //     for (uint a = 0; a < 4; a++) {
+            //         if (node[a])
+            //             speed += node[a]->influence(pos);
+            //     }
+            // }
+
+            // return speed;
         }
 
         uint split(vector<Particle> particles) {
@@ -59,13 +102,12 @@ class Node
 
             // create the nodes and get a mass sum
             if (level < NESTEDNESS) {
-                const uint NODE_COUNT = 4;
                 xyz_t half = (x2y2 - x1y1) / 2;
                 xyz_t canvas[4][2] = {{xyz_t(x1y1.x, x1y1.y, 0), xyz_t(x1y1.x + half.x, x1y1.y + half.y, 0)},
                                     {xyz_t(x1y1.x, x1y1.y + half.y, 0), xyz_t(x1y1.x + half.x, x2y2.y, 0)},
                                     {xyz_t(x1y1.x + half.x, x1y1.y, 0), xyz_t(x2y2.x, x1y1.y + half.y, 0)},
                                     {xyz_t(x1y1.x + half.x, x1y1.y + half.y, 0), xyz_t(x2y2.x, x2y2.y, 0)}};
-                for (uint a = 0; a < NODE_COUNT; a++) {
+                for (uint a = 0; a < 4; a++) {
                     if (region[a].size() > 0) {
                         node[a] = make_unique<Node>(level + 1); // create a new node
                         node[a]->setCanvasSize(canvas[a][0], canvas[a][1]);
@@ -92,6 +134,6 @@ class Node
         }
 
         Node(uint level)
-        : mass(0), level(level)
+        : mass(1E15), level(level) // mass(1E13)
         {}
 };

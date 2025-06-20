@@ -21,7 +21,6 @@ class Cloud
 
         void printsq(xyz_t pos1, xyz_t pos2);
 
-        // teoreticaly: Node node x4;
         unique_ptr<Node> node;
     
     public:
