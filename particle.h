@@ -9,6 +9,13 @@ class Particle
         xyz_t pos;
         xyz_t speed;
         float mass;
+
+    public:
+        // todo: remove
+        xyz_t lastPos;
+        bool error = false;
+        float count = 0.0f;
+        
     
     public:
         void setPos(xyz_t pos);

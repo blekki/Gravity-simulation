@@ -103,8 +103,8 @@ void Cloud::updatePos1() {
 
 
     for (uint i = 0; i < particles.size(); i++) {
-        float x = (centre.pos.x - particles[i].getX()) / 100000.0f;
-        float y = (centre.pos.y - particles[i].getY()) / 100000.0f;
+        float x = (centre.pos.x - particles[i].getX()) / VALUE_RANGE;
+        float y = (centre.pos.y - particles[i].getY()) / VALUE_RANGE;
         particles[i].addSpeed(xyz_t(x, y, 0));
         particles[i].updatePos();
     }
@@ -116,23 +116,44 @@ void Cloud::updatePos() {
     this->node->split(particles);
 
     for (uint i = 0; i < particles.size(); i++) {
-        xyz_t pos = particles[i].getXYZ();
-        particles[i].addSpeed(node->gravityVec(&particles[i]));
-        particles[i].updatePos();
-
-        // for (uint b = 0; b < particles.size(); b++) {
-        //     if (i == b) continue;
-            
+        // cout << i << endl;
+    // {uint i = 0;
+        // if (i == 0) {
+            xyz_t vec = node->gravityVec(&particles[i]);
+            particles[i].addSpeed(vec);
+            // cout << vec.x << " : " << vec.y << endl;
+            particles[i].updatePos();
         // }
-
-        // find distance
-        // calculate power
-        // calculate speed vec
     }
+
+    // {uint i = 0;
+    //     xyz_t vec(0, 0, 0);
+    //     vec = node->gravityVec(&particles[i]);
+    //     // if (isnan(vec.x) || isnan(vec.y)) {
+    //     //     cout << particles[i].count << endl;
+    //     //     cout << particles[i].getX() << " : " << particles[i].getY() << endl;
+    //     //     cout << vec.x << " : " << vec.y << endl;
+    //         // exit(0);
+    //     // }
+    //     // particles[i].addSpeed(vec);
+    //     particles[i].addSpeed(node->gravityVec(&particles[i]));
+    //     particles[i].updatePos();
+    // }
+
+
+    // for (uint i = 0; i < particles.size(); i++) {
+    //     xyz_t sum(0, 0, 0);
+    //     for (uint b = 0; b < particles.size(); b++) {
+    //         if (i != b)
+    //             sum += node->gravityVec2(&particles[i], &particles[b]);
+    //     }
+    //     particles[i].addSpeed(sum);
+    //     particles[i].updatePos();
+    // }
 }
 
 void Cloud::print() {
-
+    glPointSize(1);
     glColor3f(1.0f, 1.0f, 1.0f);
     glBegin(GL_POINTS);
     for (uint i = 0; i < particles.size(); i++) {

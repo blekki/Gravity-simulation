@@ -12,6 +12,11 @@ void Particle::setSpeed(xyz_t speed) {
 }
 
 void Particle::addSpeed(xyz_t speed) {
+    // cout << speed.x << " : " << speed.y << endl;
+    // if (isnan(speed.x) || isnan(speed.y)) {
+    //     lastPos = pos;
+    //     error = true;
+    // }
     this->speed += speed;
 }
 
@@ -31,7 +36,10 @@ void Particle::updatePos() {
     //     ok = false;
 
     // if (ok)
+    // speed = (ok) ? speed : xyz_t(0, 0, 0);
+    // pos += (ok) ? speed : xyz_t(0, 0, 0);
     pos += speed;
 
-    cout << speed.x << " : " << speed.y << endl;
+    // cout << speed.x << " : " << speed.y << endl;
+    // cout << pos.x << " : " << pos.y << endl;
 }

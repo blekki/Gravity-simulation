@@ -11,14 +11,17 @@ using namespace std;
 
 const uint WIDTH = 1024;
 const uint HEIGHT = 720;
+bool sim_pause = true;
 
 static void key_callback(GLFWwindow *window, int key, int scancode, int action, int mods) { // call actions
     // right now no one key callback exists
+    if (key == GLFW_KEY_SPACE && action == 1)
+        sim_pause = (sim_pause) ? false : true;
     return;
 }
 
 int main() {
-    // srand(time(0));
+    srand(time(0));
     // glfw initialization
     if (!glfwInit()) {
         cout << "Initialization failed" << endl;
@@ -45,17 +48,19 @@ int main() {
 
     // basic loop
     while (!glfwWindowShouldClose(window)) {
-        glViewport(0, 0, WIDTH, HEIGHT); // resize window
-        glClear(GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT); // clear scene
+        if (!sim_pause) {
+            glViewport(0, 0, WIDTH, HEIGHT); // resize window
+            glClear(GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT); // clear scene
 
-        // print particles
-        cloud.updatePos();
-        cloud.print();
+            // print particles
+            cloud.updatePos();
+            cloud.print();
 
-        // break;
+            // break;
 
-        // other
-        glfwSwapBuffers(window);
+            // other
+            glfwSwapBuffers(window);
+        }
         glfwPollEvents();
     }
 

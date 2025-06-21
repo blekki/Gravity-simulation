@@ -38,36 +38,55 @@ class Node
             this->x2y2 = x2y2;
         }
 
-        float distCube(xyz_t from, xyz_t to) {
+        double distCube(xyz_t from, xyz_t to) {
             xyz_t dist = to - from;
-            // cout << "to:   " << x1y1.x << " : " << x1y1.y << endl;
-            // cout << "from: " << from.x << " : " << from.y << endl;
-            float result = (dist.x*dist.x) + (dist.y*dist.y);// + (dist.z*dist.z);
+            double result = (dist.x*dist.x) + (dist.y*dist.y);// + (dist.z*dist.z);
             return sqrt(result);
+            // return result;
+        }
+        
+        xyz_t gravityVec2(Particle* from, Particle* to) {
+            float G = 6.6742E-10; // right = 6.6742E-11
+            float r = distCube(from->getXYZ(), to->getXYZ()); // right now sq
+            double gravity = (G * from->getMass() * to->getMass()) / r;
+
+            // println(from->getXYZ(), to->getXYZ());
+            xyz_t dist = to->getXYZ() - from->getXYZ();
+            float k = gravity / (abs(dist.x) + abs(dist.y));
+            xyz_t gravity_vec = xyz_t(k * dist.x, k * dist.y, 0);
+            return gravity_vec;
         }
 
         xyz_t gravityVec(Particle* particle) { // todo: make parameter a pointer on particle
+            xyz_t gravity_vec(0, 0, 0);
             // canvas
-            float s = distCube(x2y2, x1y1); // right now sq
-            float r = distCube(mass_centre.getXYZ(), particle->getXYZ()); // right now sq
+            float s = distCube(x1y1, x2y2); // right now sq
+            float r = distCube(particle->getXYZ(), mass_centre.getXYZ()); // right now sq
+            if (r == 0)
+                return xyz_t(0, 0, 0);
 
-            println(particle->getXYZ(), mass_centre.getXYZ());
-
-            bool last_level = false;
+            bool last_level = false; // part of bern-hat algorithm
             for (uint a = 0; a < 4; a++)
                 if (!node[a])
                     last_level = true;
 
-            xyz_t gravity_vec(0, 0, 0);
+            // bool fine = true; // gravity power calculate be everyone particle
+            // for (uint a = 0; a < 4; a++) {
+            //     if (node[a])
+            //         fine = false;
+            // }
+            // if (fine) {
             if (r / s > COEF || last_level) {
-                float G = 6.6742E-11;
-                double gravity = (G * particle->getMass() * mass_centre.getMass()) / (r * r);
-                if (isnan(gravity))
+                // println(particle->getXYZ(), mass_centre.getXYZ());
+                float G = 6.6742E-14;
+                double gravity = (G * particle->getMass() * mass_centre.getMass()) / r;
+                if (isnan(r)) {
                     exit(0);
+                }
 
                 xyz_t dist = mass_centre.getXYZ() - particle->getXYZ();
-                float k = dist.x / dist.y;
-                gravity_vec = xyz_t(gravity * k, gravity / k, 0);
+                float a = gravity / (abs(dist.x) + abs(dist.y)); // todo: some restruct
+                gravity_vec = xyz_t(a * dist.x, a * dist.y, 0);
             }
             else {
                 for (uint a = 0; a < 4; a++) {
@@ -76,7 +95,7 @@ class Node
                     }
                 }
             }
-
+            // cout << gravity_vec.x << " : " << gravity_vec.y << endl;
             return gravity_vec;
         }
 
