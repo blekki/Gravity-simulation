@@ -30,8 +30,5 @@ class Cloud
         void updatePos();
         void print();
 
-
-        void updatePos1(); //todo: remove
-
         Cloud(){}
 };
