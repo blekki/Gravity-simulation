@@ -1,3 +1,4 @@
+#pragma once
 #include "xyz_t.h"
 
 using namespace std;
@@ -7,17 +8,35 @@ class Particle
     private:
         xyz_t pos;
         xyz_t speed;
+        float mass;
+
+    public:
+        // todo: remove
+        xyz_t lastPos;
+        bool error = false;
+        float count = 0.0f;
+        
     
     public:
         void setPos(xyz_t pos);
         void setSpeed(xyz_t speed);
+        void addSpeed(xyz_t speed);
 
         float getX();
         float getY();
+        xyz_t getXYZ();
+        xyz_t getSpeed();
+        float getMass();
 
         void updatePos();
 
         Particle(xyz_t pos, xyz_t speed) 
-        : pos(pos), speed(speed)
+        : pos(pos), speed(speed), mass(1E9)
         {}
+
+        Particle(xyz_t pos, xyz_t speed, float mass) 
+        : pos(pos), speed(speed), mass(mass)
+        {}
+
+        Particle(){}
 };
