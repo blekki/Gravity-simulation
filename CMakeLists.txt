@@ -2,7 +2,7 @@ cmake_minimum_required(VERSION 3.14)
 
 project(simulation)
 
-add_executable(${PROJECT_NAME} simulation.cpp cloud.cpp particle.cpp node.cpp)
+add_executable(${PROJECT_NAME} simulation.cpp cloud.cpp particle.cpp node.cpp xyz_t.cpp)
 target_link_libraries(${PROJECT_NAME} PUBLIC GLEW glfw GL)
 
 SET(CMAKE_CXX_FLAGS "-O0 -g2")

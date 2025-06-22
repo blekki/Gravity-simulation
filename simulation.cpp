@@ -9,6 +9,7 @@
 
 using namespace std;
 
+// needy data
 const uint WIDTH = 1024;
 const uint HEIGHT = 720;
 bool sim_pause = true;
@@ -53,10 +54,8 @@ int main() {
             glClear(GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT); // clear scene
 
             // print particles
-            cloud.updatePos();
+            cloud.updateParticles();
             cloud.print();
-
-            // break;
 
             // other
             glfwSwapBuffers(window);

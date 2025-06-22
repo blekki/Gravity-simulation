@@ -16,33 +16,31 @@
 using namespace std;
 
 class Node
-{
+{   
     private:
-        // about field
-        unique_ptr<Node> node[4];
-        xyz_t x1y1;
-        xyz_t x2y2;
+        unique_ptr<Node> node[4]; // daughter nodes
+        xyz_t x1y1, x2y2;
         Particle mass_centre;
+        uint nestedness; // current daughter node level
 
-        // other
-        uint level; // current nestedness level
-
-        static const uint NESTEDNESS = 8; // max level
-        static constexpr float COEF = 1.0f; // coef of (node size / dist)
+        static int maxFieldSize; // max position from centre for particles
+        
+        static const uint MAX_NESTEDNESS = 8;
+        static constexpr float COEF = 1.0f; // calculation accuracy (node size / dist > coef)
 
     public:
-        void setCanvasSize(xyz_t x1y1, xyz_t x2y2);
-        double distCube(xyz_t from, xyz_t to);
-        
-        xyz_t gravityVec2(Particle* from, Particle* to);
-        xyz_t gravityVec(Particle* particle);
-
+        void setParentFieldSize(xyz_t x1y1, xyz_t x2y2);
+        void setFieldSize(xyz_t x1y1, xyz_t x2y2);
         float split(vector<Particle> particles);
+        
+        double dist(xyz_t from, xyz_t to);
+        xyz_t oldGravityInf(Particle* from, Particle* to);
+        xyz_t gravityInf(Particle* particle);
 
-        void printsq(xyz_t x1y1, xyz_t x2y2);
-        void println(xyz_t from, xyz_t to);
+        // for debug
+        void printNodeSectors(xyz_t x1y1, xyz_t x2y2);
+        void printInfLine(xyz_t from, xyz_t to);
 
-        Node(uint level)
-        : level(level)
-        {}
+        Node(uint nestedness) : nestedness(nestedness) {}
+        Node() : nestedness(0) {}
 };

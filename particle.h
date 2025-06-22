@@ -11,13 +11,6 @@ class Particle
         float mass;
 
     public:
-        // todo: remove
-        xyz_t lastPos;
-        bool error = false;
-        float count = 0.0f;
-        
-    
-    public:
         void setPos(xyz_t pos);
         void setSpeed(xyz_t speed);
         void addSpeed(xyz_t speed);
@@ -30,13 +23,11 @@ class Particle
 
         void updatePos();
 
-        Particle(xyz_t pos, xyz_t speed) 
+        Particle(xyz_t pos, xyz_t speed)
         : pos(pos), speed(speed), mass(1E9)
         {}
-
         Particle(xyz_t pos, xyz_t speed, float mass) 
         : pos(pos), speed(speed), mass(mass)
         {}
-
         Particle(){}
 };
