@@ -4,7 +4,10 @@
 #include <GL/glew.h>
 #include <GLFW/glfw3.h>
 #include <GL/gl.h>
+#include <GL/glu.h>
 
+#include "enums.h"
+#include "camera.h"
 #include "cloud.h"
 
 using namespace std;
@@ -22,7 +25,7 @@ static void key_callback(GLFWwindow *window, int key, int scancode, int action, 
 }
 
 int main() {
-    srand(time(0));
+    // srand(time(0)); // todo: uncomment
     // glfw initialization
     if (!glfwInit()) {
         cout << "Initialization failed" << endl;
@@ -41,8 +44,10 @@ int main() {
     glEnable(GL_DEPTH_TEST);
     glEnable(GL_BLEND);
 
+    Camera camera(WIDTH, HEIGHT);
+    camera.updateMat();
 
-    Cloud cloud;
+    Cloud cloud(DIMENSION_3D);
     cloud.newParticles();
     cloud.print();
     glfwSwapBuffers(window);
@@ -51,6 +56,10 @@ int main() {
     while (!glfwWindowShouldClose(window)) {
         if (!sim_pause) {
             glViewport(0, 0, WIDTH, HEIGHT); // resize window
+            
+            camera.rotate();
+            
+            
             glClear(GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT); // clear scene
 
             // print particles

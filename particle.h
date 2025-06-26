@@ -17,6 +17,7 @@ class Particle
 
         float getX();
         float getY();
+        float getZ();
         xyz_t getXYZ();
         xyz_t getSpeed();
         float getMass();
@@ -24,7 +25,7 @@ class Particle
         void updatePos();
 
         Particle(xyz_t pos, xyz_t speed)
-        : pos(pos), speed(speed), mass(1E9)
+        : pos(pos), speed(speed), mass(1E9) //1E9 //1.5E14
         {}
         Particle(xyz_t pos, xyz_t speed, float mass) 
         : pos(pos), speed(speed), mass(mass)

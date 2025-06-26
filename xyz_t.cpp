@@ -1,15 +1,16 @@
 #include "xyz_t.h"
+#include "math.h"
 
 void xyz_t::normalize() {
     xyz_t k(1, 1, 1);
-    xyz_t current;
-    current.x = k.x / this->x;
-    current.y = k.y / this->y;
-    current.z = k.z / this->z;
+    xyz_t vec;
+    vec.x = k.x / abs(this->x);
+    vec.y = k.y / abs(this->y);
+    vec.z = k.z / abs(this->z);
 
-    this->x = this->x * current.x;
-    this->y = this->y * current.y;
-    this->z = this->z * current.z;
+    this->x = this->x * vec.x;
+    this->y = this->y * vec.y;
+    this->z = this->z * vec.z;
 }
 
 void xyz_t::operator+=(xyz_t other) {

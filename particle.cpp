@@ -17,6 +17,7 @@ void Particle::addSpeed(xyz_t speed) {
 
 float Particle::getX() { return pos.x; }
 float Particle::getY() { return pos.y; }
+float Particle::getZ() { return pos.z; }
 xyz_t Particle::getXYZ() { return pos; }
 xyz_t Particle::getSpeed() { return speed; }
 float Particle::getMass() {return mass; }
