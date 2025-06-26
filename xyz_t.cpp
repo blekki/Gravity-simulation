@@ -13,6 +13,13 @@ void xyz_t::normalize() {
     this->z = this->z * vec.z;
 }
 
+void xyz_t::offset() {
+    float a = this->z;
+    this->z = this->y;
+    this->y = this->x;
+    this->x = a;
+}
+
 void xyz_t::operator+=(xyz_t other) {
     this->x += other.x;
     this->y += other.y;
@@ -41,6 +48,22 @@ xyz_t xyz_t::operator*(xyz_t other) {
     current.y = this->y * other.y;
     current.z = this->z * other.z;
     return current;
+}
+
+xyz_t xyz_t::operator+(float num) {
+    xyz_t result;
+    result.x = this->x + num;
+    result.y = this->y + num;
+    result.z = this->z + num;
+    return result;
+}
+
+xyz_t xyz_t::operator-(float num) {
+    xyz_t result;
+    result.x = this->x - num;
+    result.y = this->y - num;
+    result.z = this->z - num;
+    return result;
 }
 
 xyz_t xyz_t::operator/(float num) {

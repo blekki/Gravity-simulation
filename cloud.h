@@ -19,7 +19,7 @@ class Cloud
         // range where particles can be created
         static const long long int SPACE_SIZE = 1E6; // km from centre
         static const int SPEED_RANGE = 1000;
-        static const int PARTICLE_COUNT = 100; // 3000
+        static const int PARTICLE_COUNT = 1000; // 3000
         
         void newParticles2d();
         void newParticles3d();

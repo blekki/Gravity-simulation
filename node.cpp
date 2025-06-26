@@ -1,6 +1,7 @@
 #include "node.h"
 
 #include "math.h"
+#include "functional"
 
 long long int Node::maxFieldSize;
 
@@ -68,6 +69,42 @@ xyz_t Node::gravityInf(Particle* particle) {
     }
 
     return gravity_vec;
+}
+
+vector<pair<xyz_t, xyz_t>> Node::division(xyz_t x1y1, xyz_t x2y2) {
+    vector<pair<xyz_t, xyz_t>> blocks; // array full (x1y1, x2y2) per line
+
+    xyz_t center = (x2y2 + x1y1) / 2.0f;      // actually a centre
+    float quarter = (x2y2.x - x1y1.x) / 4.0f; // 1/4 of one coord length
+    xyz_t offset(quarter, 0, 0);              // how the centre must be moved for be changed to x1y1 and x2y2 
+
+    // Start of lambda func.
+    // It dublicate the centre as a pair of two position with some changed coords, but only by one dimension.
+    // Repeat this action with the new position pack until it fill all space.
+    // Example: 
+    // for 2d world do it 2 times (result = 4 differ spaces)
+    // for 3d world do it 3 times (result = 8 differ spaces)
+    const int MAX_LAYER = dimension;
+    function<void(xyz_t, xyz_t, int)> mirror;
+    mirror = [&](xyz_t pos, xyz_t offset, int layer) {
+        if (layer == MAX_LAYER) { // centre into x1y1, x2y2
+            xyz_t coord1 = pos - quarter;
+            xyz_t coord2 = pos + quarter;
+            blocks.push_back(pair(coord1, coord2)); // save results
+            return;
+        }
+
+        xyz_t minus = pos - offset;
+        xyz_t plus = pos + offset;
+
+        offset.offset();
+        layer++;
+        mirror(minus, offset, layer);
+        mirror(plus, offset, layer);
+    };
+    mirror(center, offset, FIRST_LAYER);
+
+    return blocks;
 }
 
 void Node::split(vector<Particle> particles) {
@@ -153,24 +190,14 @@ float Node::split3d(vector<Particle> particles) {
     // create the nodes and get a mass sum
     float sum_mass = 0.0f;
     if (nestedness < MAX_NESTEDNESS) {
-        xyz_t half = (x2y2 - x1y1) / 2;
-        xyz_t canvas[8][2] = {{xyz_t(x1y1.x, x1y1.y, x1y1.z),                   xyz_t(x1y1.x + half.x, x1y1.y + half.y, x1y1.z + half.z)},
-                              {xyz_t(x1y1.x, x1y1.y + half.y, x1y1.z),          xyz_t(x1y1.x + half.x, x2y2.y, x1y1.z + half.z)},
-                              {xyz_t(x1y1.x + half.x, x1y1.y, x1y1.z),          xyz_t(x2y2.x, x1y1.y + half.y, x1y1.z + half.z)},
-                              {xyz_t(x1y1.x + half.x, x1y1.y + half.y, x1y1.z), xyz_t(x2y2.x, x2y2.y, x1y1.z + half.z)},
-
-                              {xyz_t(x1y1.x, x1y1.y, x1y1.z + half.z),                   xyz_t(x1y1.x + half.x, x1y1.y + half.y, x2y2.z)},
-                              {xyz_t(x1y1.x, x1y1.y + half.y, x1y1.z + half.z),          xyz_t(x1y1.x + half.x, x2y2.y, x2y2.z)},
-                              {xyz_t(x1y1.x + half.x, x1y1.y, x1y1.z + half.z),          xyz_t(x2y2.x, x1y1.y + half.y, x2y2.z)},
-                              {xyz_t(x1y1.x + half.x, x1y1.y + half.y, x1y1.z + half.z), xyz_t(x2y2.x, x2y2.y, x2y2.z)}
-                            };
+        vector<pair<xyz_t, xyz_t>> canvas = division(x1y1, x2y2);
         for (uint a = 0; a < daughter_count; a++) {
             node[a] = Node(dimension, nestedness + 1); // create a daughter node
-            node[a].setFieldSize(canvas[a][0], canvas[a][1]);
+            node[a].setFieldSize(canvas[a].first, canvas[a].second);
             sum_mass += node[a].split3d(regions[a]); // recursion split the daughter node to the smaller nodes
             
             // <> (debug and just a nice visualization) <>
-            printNodeSectors3d(canvas[a][0], canvas[a][1]);
+            printNodeSectors3d(canvas[a].first, canvas[a].second);
         }
     }
 
@@ -178,7 +205,7 @@ float Node::split3d(vector<Particle> particles) {
     return sum_mass;
 }
 
-void Node::printNodeSectors2d(xyz_t x1y1, xyz_t x2y2) { // todo: remove
+void Node::printNodeSectors2d(xyz_t x1y1, xyz_t x2y2) { // print quad around every dot
     x1y1 = x1y1 / maxFieldSize;
     x2y2 = x2y2 / maxFieldSize;
     const float brightness = 0.3f;
@@ -192,67 +219,35 @@ void Node::printNodeSectors2d(xyz_t x1y1, xyz_t x2y2) { // todo: remove
     glEnd();
 }
 
-void Node::printNodeSectors3d(xyz_t x1y1, xyz_t x2y2) { // todo: remove
+void Node::printNodeSectors3d(xyz_t x1y1, xyz_t x2y2) { // print cube around every dot
     x1y1 = x1y1 / maxFieldSize;
     x2y2 = x2y2 / maxFieldSize;
     const float brightness = 0.3f;
     glColor3f(brightness, brightness, brightness);
-
     glBegin(GL_LINE_STRIP);
-    // vertice 1
+    // iter 1
     glVertex3f(x1y1.x, x1y1.y, x1y1.z);
     glVertex3f(x1y1.x, x2y2.y, x1y1.z);
     glVertex3f(x2y2.x, x2y2.y, x1y1.z);
     glVertex3f(x2y2.x, x1y1.y, x1y1.z);
     glVertex3f(x1y1.x, x1y1.y, x1y1.z);
-    // vertice 2
+    // iter 2
     glVertex3f(x1y1.x, x1y1.y, x2y2.z);
     glVertex3f(x1y1.x, x2y2.y, x2y2.z);
     glVertex3f(x1y1.x, x2y2.y, x1y1.z);
-    // vertice 3
+    // iter 3
     glVertex3f(x2y2.x, x2y2.y, x1y1.z);
     glVertex3f(x2y2.x, x2y2.y, x2y2.z);
     glVertex3f(x1y1.x, x2y2.y, x2y2.z);
-    // vertice 3
+    // iter 3
     glVertex3f(x1y1.x, x1y1.y, x2y2.z);
     glVertex3f(x2y2.x, x1y1.y, x2y2.z);
     glVertex3f(x2y2.x, x2y2.y, x2y2.z);
-    // vertice 3
+    // iter 3
     glVertex3f(x2y2.x, x2y2.y, x1y1.z);
     glVertex3f(x2y2.x, x1y1.y, x1y1.z);
     glVertex3f(x2y2.x, x1y1.y, x2y2.z);
     glEnd();
-
-    return;
-    // face 1 
-    // glBegin(GL_LINE_LOOP);
-    // glVertex3f(x1y1.x, x1y1.y, x1y1.z);
-    // glVertex3f(x1y1.x, x2y2.y, x1y1.z);
-    // glVertex3f(x2y2.x, x2y2.y, x1y1.z);
-    // glVertex3f(x2y2.x, x1y1.y, x1y1.z);
-    // glEnd();
-    // // face 2
-    // glBegin(GL_LINE_LOOP);
-    // glVertex3f(x1y1.x, x1y1.y, x2y2.z);
-    // glVertex3f(x1y1.x, x2y2.y, x2y2.z);
-    // glVertex3f(x2y2.x, x2y2.y, x2y2.z);
-    // glVertex3f(x2y2.x, x1y1.y, x2y2.z);
-    // glEnd();
-    
-    // glBegin(GL_LINES);
-    // // indice 1
-    // glVertex3f(x1y1.x, x1y1.y, x1y1.z);
-    // glVertex3f(x1y1.x, x1y1.y, x2y2.z);
-    // // indice 2
-    // glVertex3f(x1y1.x, x2y2.y, x1y1.z);
-    // glVertex3f(x1y1.x, x2y2.y, x2y2.z);
-    // // indice 3
-    // glVertex3f(x2y2.x, x2y2.y, x1y1.z);
-    // glVertex3f(x2y2.x, x2y2.y, x2y2.z);
-    // // indice 4
-    // glVertex3f(x2y2.x, x1y1.y, x1y1.z);
-    // glVertex3f(x2y2.x, x1y1.y, x2y2.z);
-    // glEnd();
 }
 
 void Node::printInfLine(xyz_t from, xyz_t to) {
