@@ -20,6 +20,16 @@ void xyz_t::offset() {
     this->x = a;
 }
 
+float xyz_t::axis(uint index) {
+    switch (index) {
+        case 0: return this->x; break;
+        case 1: return this->y; break;
+        case 2: return this->z; break;
+        default: return NAN; break;
+    }
+}
+
+// overload operators
 void xyz_t::operator+=(xyz_t other) {
     this->x += other.x;
     this->y += other.y;

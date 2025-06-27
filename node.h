@@ -29,6 +29,7 @@ class Node
         static constexpr float COEF = 1.0f; // calculation accuracy (node size / dist > coef)
 
         vector<pair<xyz_t, xyz_t>> division(xyz_t x1y1, xyz_t x2y2);
+        uint kindRegion(Particle* particle);
         float split2d(vector<Particle> particles);
         float split3d(vector<Particle> particles);
 

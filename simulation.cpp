@@ -21,7 +21,9 @@ static void key_callback(GLFWwindow *window, int key, int scancode, int action, 
     // right now no one key callback exists
     if (key == GLFW_KEY_SPACE && action == 1)
         sim_pause = (sim_pause) ? false : true;
-    return;
+    
+    if (key == GLFW_KEY_ESCAPE && action == 1)
+        glfwSetWindowShouldClose(window, true);
 }
 
 int main() {
@@ -57,7 +59,7 @@ int main() {
         if (!sim_pause) {
             glViewport(0, 0, WIDTH, HEIGHT); // resize window
             
-            camera.rotate();
+            // camera.rotate();
             
             
             glClear(GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT); // clear scene

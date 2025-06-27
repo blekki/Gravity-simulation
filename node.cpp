@@ -3,6 +3,8 @@
 #include "math.h"
 #include "functional"
 
+#include "iostream"
+
 long long int Node::maxFieldSize;
 
 void Node::setParentFieldSize(xyz_t x1y1, xyz_t x2y2) {
@@ -71,8 +73,8 @@ xyz_t Node::gravityInf(Particle* particle) {
     return gravity_vec;
 }
 
-vector<pair<xyz_t, xyz_t>> Node::division(xyz_t x1y1, xyz_t x2y2) {
-    vector<pair<xyz_t, xyz_t>> blocks; // array full (x1y1, x2y2) per line
+vector<pair<xyz_t, xyz_t>> Node::division(xyz_t x1y1, xyz_t x2y2) { // todo: remove parameters
+    vector<pair<xyz_t, xyz_t>> blocks; // array full (x1y1, x2y2) coords per line
 
     xyz_t center = (x2y2 + x1y1) / 2.0f;      // actually a centre
     float quarter = (x2y2.x - x1y1.x) / 4.0f; // 1/4 of one coord length
@@ -107,6 +109,54 @@ vector<pair<xyz_t, xyz_t>> Node::division(xyz_t x1y1, xyz_t x2y2) {
     return blocks;
 }
 
+uint Node::kindRegion(Particle* particle) {
+    xyz_t coord = particle->getXYZ();
+    xyz_t node_size(x2y2 - x1y1);
+
+    int kind = daughter_count;
+
+    // 1.
+    // {
+        // float centerX = node_size.x / 2.0f + x1y1.x;
+        // kind = (coord.x > centerX) ? (kind - 1) : (kind - 2);
+    // }
+    // uint index = dimension - 1;
+    // float centerX = node_size.axis(index) / 2.0f + x1y1.axis(index);
+    // kind = (coord.axis(index) > centerX) ? (kind - 1) : (kind - 2);
+
+    // 2.
+    // uint len = dimension - 2;
+    // int k[len];
+    // for (uint i = 0; i < dimension - 1; i++) {
+    //     k[len - i] = 2 * i;
+    //     cout << k[len - i] << " ";
+    // }
+    // cout << endl;
+
+    // float centerX = node_size.x / 2.0f + x1y1.x;
+    // kind = (coord.x > centerX) ? (kind - 1) : (kind - 2);
+
+    // for (uint index = 1; index < dimension; index++) {
+    //     float center = node_size.axis(index) / 2 + x1y1.axis(index);
+    //     if (coord.axis(index) > center)
+    //         kind += k[index];
+    // }
+
+    // 3.
+    int max_index = dimension - 1;
+    for (int index = max_index - 1; index >= 0; index--) {
+        float center = node_size.axis(index) / 2 + x1y1.axis(index);
+        if (coord.axis(index) < center)
+            kind -= 2 * (max_index - index);
+    }
+
+    float center = node_size.axis(max_index) / 2.0f + x1y1.axis(max_index);
+    kind = (coord.axis(max_index) < center) ? (kind - 2) : (kind - 1);
+
+    // cout << kind;
+    return kind;
+}
+
 void Node::split(vector<Particle> particles) {
     switch (dimension) {
         case DIMENSION_2D: split2d(particles); break;
@@ -132,9 +182,27 @@ float Node::split2d(vector<Particle> particles) {
     xyz_t node_size(x2y2 - x1y1); //todo: x1y1 --> x1y1z1
     for (uint a = 0; a < particles.size(); a++) {
         // inside what kind quad is particle
-        int kind = daughter_count;
+        int kind = daughter_count; // 4
         kind = (particles[a].getX() > (node_size.x / 2 + x1y1.x)) ? (kind)     : (kind - 2);
         kind = (particles[a].getY() > (node_size.y / 2 + x1y1.y)) ? (kind - 1) : (kind - 2);
+        cout << kind << " ";
+        
+        // int kind2 = -1;
+        // kind2 = (particles[a].getX() > (node_size.x / 2 + x1y1.x)) ? (kind2 + 3) : (kind2 + 1);
+        // kind2 = (particles[a].getY() > (node_size.y / 2 + x1y1.y)) ? (kind2 + 1) : (kind2);
+        // cout << kind2 << endl;
+
+        // int kind2 = 4;
+        // kind2 = (particles[a].getX() > (node_size.x / 2 + x1y1.x)) ? (kind2 - 1) : (kind2 - 2);
+        // kind2 = (particles[a].getY() > (node_size.y / 2 + x1y1.y)) ? (kind2) : (kind2 - 2);
+        // cout << kind2 << " ";
+        kindRegion(&particles[a]);
+
+        cout << endl;
+        // uint kind = kindRegion(&particles[a]);
+        // kindRegion(&particles[a]);
+        // kindRegion(&particles[a]);
+
         // remember where particle stays
         regions[kind].push_back(particles[a]);
     }
@@ -144,17 +212,19 @@ float Node::split2d(vector<Particle> particles) {
     if (nestedness < MAX_NESTEDNESS) {
         xyz_t half = (x2y2 - x1y1) / 2; // todo: rename centre
         // todo: canvas[daughter_count, 2]
-        xyz_t canvas[4][2] = {{xyz_t(x1y1.x, x1y1.y, 0), xyz_t(x1y1.x + half.x, x1y1.y + half.y, 0)},
-                              {xyz_t(x1y1.x, x1y1.y + half.y, 0), xyz_t(x1y1.x + half.x, x2y2.y, 0)},
-                              {xyz_t(x1y1.x + half.x, x1y1.y, 0), xyz_t(x2y2.x, x1y1.y + half.y, 0)},
-                              {xyz_t(x1y1.x + half.x, x1y1.y + half.y, 0), xyz_t(x2y2.x, x2y2.y, 0)}};
+        // xyz_t canvas[4][2] = {{xyz_t(x1y1.x, x1y1.y, 0), xyz_t(x1y1.x + half.x, x1y1.y + half.y, 0)},
+        //                       {xyz_t(x1y1.x, x1y1.y + half.y, 0), xyz_t(x1y1.x + half.x, x2y2.y, 0)},
+        //                       {xyz_t(x1y1.x + half.x, x1y1.y, 0), xyz_t(x2y2.x, x1y1.y + half.y, 0)},
+        //                       {xyz_t(x1y1.x + half.x, x1y1.y + half.y, 0), xyz_t(x2y2.x, x2y2.y, 0)}};
+        vector<pair<xyz_t, xyz_t>> canvas = division(x1y1, x2y2);
         for (uint a = 0; a < daughter_count; a++) {
             node[a] = Node(dimension, nestedness + 1); // create a daughter node
-            node[a].setFieldSize(canvas[a][0], canvas[a][1]);
+            // node[a].setFieldSize(canvas[a][0], canvas[a][1]);
+            node[a].setFieldSize(canvas[a].first, canvas[a].second);
             sum_mass += node[a].split2d(regions[a]); // recursion split the daughter node to the smaller nodes
             
             // <> (debug and just a nice visualization) <>
-            printNodeSectors2d(canvas[a][0], canvas[a][1]);
+            printNodeSectors2d(canvas[a].first, canvas[a].second);
         }
     }
     mass_centre = Particle((x2y2 - x1y1) / 2 + x1y1, xyz_t(0, 0, 0), sum_mass);
@@ -179,11 +249,21 @@ float Node::split3d(vector<Particle> particles) {
     xyz_t node_size(x2y2 - x1y1); //todo: x1y1 --> x1y1z1
     for (uint a = 0; a < particles.size(); a++) {
         // inside what kind quad
-        int kind = daughter_count;
-        kind = (particles[a].getX() > (node_size.x / 2 + x1y1.x)) ? (kind)     : (kind - 4);
-        kind = (particles[a].getY() > (node_size.y / 2 + x1y1.y)) ? (kind)     : (kind - 2);
-        kind = (particles[a].getZ() > (node_size.z / 2 + x1y1.z)) ? (kind - 1) : (kind - 2);
+        // int kind = daughter_count; // 8
+        // kind = (particles[a].getX() > (node_size.x / 2 + x1y1.x)) ? (kind)     : (kind - 4);
+        // kind = (particles[a].getY() > (node_size.y / 2 + x1y1.y)) ? (kind)     : (kind - 2);
+        // kind = (particles[a].getZ() > (node_size.z / 2 + x1y1.z)) ? (kind - 1) : (kind - 2);
+        // cout << kind << " ";
+        // kindRegion(&particles[a]);
+        // cout << endl;
+        // int kind2 = -1;
+        // kind2 = (particles[a].getX() > (node_size.x / 2 + x1y1.x)) ? (kind2 + 4) : (kind2 + 1);
+        // kind2 = (particles[a].getY() > (node_size.y / 2 + x1y1.y)) ? (kind2 + 1) : (kind2); //+1
+        // kind2 = (particles[a].getZ() > (node_size.z / 2 + x1y1.z)) ? (kind2 + 4) : (kind2);
+        // cout << kind2 << endl;
+
         // remember where particle stays
+        uint kind = kindRegion(&particles[a]);
         regions[kind].push_back(particles[a]);
     }
 
