@@ -9,7 +9,8 @@ struct xyz_t
 
     void normalize();
     void offset();
-    float axis(uint index);
+    float axis(uint index); //todo: axis --> getAxis
+    void setAxis(uint index, float value);
     
     void operator+=(xyz_t other);
     xyz_t operator+(xyz_t other);

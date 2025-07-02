@@ -6,49 +6,56 @@
 
 void Cloud::newParticles() {
     
-    // for (uint i = 0; i < PARTICLE_COUNT; i++) {
-    //     for 
+    for (uint p = 0; p < PARTICLE_COUNT; p++) {
+        xyz_t pos(0, 0, 0);
+        for (uint axis = 0; axis < dimension; axis++) {
+            float value = rand() % (SPACE_SIZE) * 2.0f - SPACE_SIZE;
+            pos.setAxis(axis, value);
+        }
+
+        xyz_t speed(0, 0, 0);
+        particles.push_back(Particle(pos, speed));
+    }
+
+    // switch (dimension) {
+    //     case DIMENSION_2D: newParticles2d(); break;
+    //     case DIMENSION_3D: newParticles3d(); break;
+    //     default: break;
     // }
-
-    switch (dimension) {
-        case DIMENSION_2D: newParticles2d(); break;
-        case DIMENSION_3D: newParticles3d(); break;
-        default: break;
-    }
 }
 
-void Cloud::newParticles2d() {
-    for (uint i = 0; i < PARTICLE_COUNT; i++) {
-        // position in the space
-        float x = rand() % (SPACE_SIZE) * 2.0f - SPACE_SIZE;
-        float y = rand() % (SPACE_SIZE) * 2.0f - SPACE_SIZE;
-        xyz_t pos(x, y, 0);
+// void Cloud::newParticles2d() {
+//     for (uint i = 0; i < PARTICLE_COUNT; i++) {
+//         // position in the space
+//         float x = rand() % (SPACE_SIZE) * 2.0f - SPACE_SIZE;
+//         float y = rand() % (SPACE_SIZE) * 2.0f - SPACE_SIZE;
+//         xyz_t pos(x, y, 0);
 
-        // possibility generate particle speed
-        float sx = 0; //rand() % SPEED_RANGE * 2.0f - SPEED_RANGE;
-        float sy = 0; //rand() % SPEED_RANGE * 2.0f - SPEED_RANGE;
+//         // possibility generate particle speed
+//         float sx = 0; //rand() % SPEED_RANGE * 2.0f - SPEED_RANGE;
+//         float sy = 0; //rand() % SPEED_RANGE * 2.0f - SPEED_RANGE;
 
-        xyz_t speed(sx, sy, 0);
-        particles.push_back(Particle(pos, speed));
-    }
-}
+//         xyz_t speed(sx, sy, 0);
+//         particles.push_back(Particle(pos, speed));
+//     }
+// }
 
-void Cloud::newParticles3d() {
-    for (uint i = 0; i < PARTICLE_COUNT; i++) {
-        // position in the space
-        float x = rand() % (SPACE_SIZE) * 2.0f - SPACE_SIZE;
-        float y = rand() % (SPACE_SIZE) * 2.0f - SPACE_SIZE;
-        float z = rand() % (SPACE_SIZE) * 2.0f - SPACE_SIZE;
-        xyz_t pos(x, y, z);
+// void Cloud::newParticles3d() {
+//     for (uint i = 0; i < PARTICLE_COUNT; i++) {
+//         // position in the space
+//         float x = rand() % (SPACE_SIZE) * 2.0f - SPACE_SIZE;
+//         float y = rand() % (SPACE_SIZE) * 2.0f - SPACE_SIZE;
+//         float z = rand() % (SPACE_SIZE) * 2.0f - SPACE_SIZE;
+//         xyz_t pos(x, y, z);
 
-        // possibility generate particle speed
-        float sx = 0; //rand() % SPEED_RANGE * 2.0f - SPEED_RANGE;
-        float sy = 0; //rand() % SPEED_RANGE * 2.0f - SPEED_RANGE;
+//         // possibility generate particle speed
+//         float sx = 0; //rand() % SPEED_RANGE * 2.0f - SPEED_RANGE;
+//         float sy = 0; //rand() % SPEED_RANGE * 2.0f - SPEED_RANGE;
 
-        xyz_t speed(sx, sy, 0);
-        particles.push_back(Particle(pos, speed));
-    }
-}
+//         xyz_t speed(sx, sy, 0);
+//         particles.push_back(Particle(pos, speed));
+//     }
+// }
 
 void Cloud::updateParticles() {
     this->node = make_unique<Node>(dimension);

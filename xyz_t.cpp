@@ -29,6 +29,15 @@ float xyz_t::axis(uint index) {
     }
 }
 
+void xyz_t::setAxis(uint index, float value) {
+    switch (index) {
+        case 0: this->x = value; break;
+        case 1: this->y = value; break;
+        case 2: this->z = value; break;
+        default: break;
+    }
+}
+
 // overload operators
 void xyz_t::operator+=(xyz_t other) {
     this->x += other.x;

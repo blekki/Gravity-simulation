@@ -23,8 +23,8 @@ class Cloud
         const int POINT_WIDTH = 1;
         const float POINT_COLOR[3] = {1.0f, 1.0f, 1.0f};
         
-        void newParticles2d();
-        void newParticles3d();
+        // void newParticles2d();
+        // void newParticles3d();
 
         // void print2d();
         // void print3d();
