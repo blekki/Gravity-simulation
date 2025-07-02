@@ -81,9 +81,9 @@ vector<pair<xyz_t, xyz_t>> Node::division(xyz_t x1y1, xyz_t x2y2) { // todo: rem
     xyz_t offset(quarter, 0, 0);              // how the centre must be moved for be changed to x1y1 and x2y2 
 
     // Start of lambda func.
-    // It dublicate the centre as a pair of two position with some changed coords, but only by one dimension.
+    // It dublicate the centre ((x2y2 - x1y1) / 2) as a pair of two position with some changed coords, but only by one dimension.
     // Repeat this action with the new position pack until it fill all space.
-    // Example: 
+    // Example:
     // for 2d world do it 2 times (result = 4 differ spaces)
     // for 3d world do it 3 times (result = 8 differ spaces)
     const int MAX_LAYER = dimension;
@@ -151,7 +151,7 @@ float Node::split2d(vector<Particle> particles) {
     vector<Particle> regions[daughter_count];
     xyz_t node_size(x2y2 - x1y1); //todo: x1y1 --> x1y1z1
     for (uint a = 0; a < particles.size(); a++) {
-        // inside what kind quad is particle        
+        // inside what kind quad is particle
         uint kind = kindRegion(&particles[a]);
         regions[kind].push_back(particles[a]);
     }
@@ -260,7 +260,7 @@ void Node::printNodeSectors3d(xyz_t x1y1, xyz_t x2y2) { // print cube around eve
     glEnd();
 }
 
-void Node::printInfLine(xyz_t from, xyz_t to) {
+void Node::printInfLine(xyz_t from, xyz_t to) { // inf = influence
     from = from / maxFieldSize;
     to = to / maxFieldSize;
     glColor3f(1.0f, 0.0f, 0.0f);

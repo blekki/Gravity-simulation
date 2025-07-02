@@ -5,6 +5,11 @@
 #include "cloud.h"
 
 void Cloud::newParticles() {
+    
+    // for (uint i = 0; i < PARTICLE_COUNT; i++) {
+    //     for 
+    // }
+
     switch (dimension) {
         case DIMENSION_2D: newParticles2d(); break;
         case DIMENSION_3D: newParticles3d(); break;
@@ -50,8 +55,6 @@ void Cloud::updateParticles() {
     this->node->setParentFieldSize(xyz_t(-SPACE_SIZE, -SPACE_SIZE, -SPACE_SIZE), xyz_t(SPACE_SIZE, SPACE_SIZE, SPACE_SIZE));
     this->node->split(particles);
     
-    // return; // !!!!!!!!!!!!!
-
     for (uint i = 0; i < particles.size(); i++) {
         xyz_t vec = node->gravityInf(&particles[i]);
         particles[i].addSpeed(vec);
@@ -59,33 +62,33 @@ void Cloud::updateParticles() {
     }
 }
 
-void Cloud::print() {
-    glPointSize(1);
-    glColor3f(1.0f, 1.0f, 1.0f);
-    glBegin(GL_POINTS);
-    switch (dimension) {
-        case DIMENSION_2D: print2d(); break;
-        case DIMENSION_3D: print3d(); break;
-        default: break;
-    }
-    glEnd();
-}
+// void Cloud::print() {
+//     glPointSize(POINT_WIDTH);
+//     glColor3f(1.0f, 1.0f, 1.0f);
+//     glBegin(GL_POINTS);
+//     switch (dimension) {
+//         case DIMENSION_2D: print2d(); break;
+//         case DIMENSION_3D: print3d(); break;
+//         default: break;
+//     }
+//     glEnd();
+// }
 
-void Cloud::print2d() {
-    for (uint i = 0; i < particles.size(); i++) {
-        // space into window coord
-        float x = particles[i].getX() / (SPACE_SIZE * 1.0f);
-        float y = particles[i].getY() / (SPACE_SIZE * 1.0f);
-        glVertex2f(x, y);
-    }
-}
+// void Cloud::print2d() {
+//     for (uint i = 0; i < particles.size(); i++) {
+//         // space into window coord
+//         float x = particles[i].getX() / (SPACE_SIZE * 1.0f);
+//         float y = particles[i].getY() / (SPACE_SIZE * 1.0f);
+//         glVertex2f(x, y);
+//     }
+// }
 
-void Cloud::print3d() {
-    for (uint i = 0; i < particles.size(); i++) {
-        // space into window coord
-        float x = particles[i].getX() / (SPACE_SIZE * 1.0f);
-        float y = particles[i].getY() / (SPACE_SIZE * 1.0f);
-        float z = particles[i].getZ() / (SPACE_SIZE * 1.0f);
-        glVertex3f(x, y, z);
-    }
-}
+// void Cloud::print3d() {
+//     for (uint i = 0; i < particles.size(); i++) {
+//         // space into window coord
+//         float x = particles[i].getX() / (SPACE_SIZE * 1.0f);
+//         float y = particles[i].getY() / (SPACE_SIZE * 1.0f);
+//         float z = particles[i].getZ() / (SPACE_SIZE * 1.0f);
+//         glVertex3f(x, y, z);
+//     }
+// }

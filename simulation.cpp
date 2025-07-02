@@ -8,7 +8,7 @@
 
 #include "enums.h"
 #include "camera.h"
-#include "cloud.h"
+#include "cloud2d.h"
 
 using namespace std;
 
@@ -49,7 +49,7 @@ int main() {
     Camera camera(WIDTH, HEIGHT);
     camera.updateMat();
 
-    Cloud cloud(DIMENSION_3D);
+    Cloud2d cloud; //todo: CloudFactory
     cloud.newParticles();
     cloud.print();
     glfwSwapBuffers(window);
