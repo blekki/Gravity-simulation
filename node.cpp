@@ -128,15 +128,16 @@ uint Node::kindRegion(Particle* particle) {
 }
 
 void Node::split(vector<Particle> particles) {
-    switch (dimension) {
-        case DIMENSION_2D: split2d(particles); break;
-        case DIMENSION_3D: split3d(particles); break;
-        default: break;
-    }
+    // switch (dimension) {
+    //     case DIMENSION_2D: split2d(particles); break;
+    //     case DIMENSION_3D: split3d(particles); break;
+    //     default: break;
+    // }
+    splitSpace(particles);
 }
 
-float Node::split2d(vector<Particle> particles) {
-    daughter_count = 4;
+float Node::splitSpace(vector<Particle> particles) {
+    daughter_count = pow(2, (uint) dimension);
     if (particles.size() == 0) { // space without particles
         mass_centre = Particle(xyz_t(0, 0, 0), xyz_t(0, 0, 0), 0.0f);
         return 0.0f;
@@ -159,16 +160,21 @@ float Node::split2d(vector<Particle> particles) {
     // create the nodes and get a mass sum
     float sum_mass = 0.0f;
     if (nestedness < MAX_NESTEDNESS) {
-        xyz_t half = (x2y2 - x1y1) / 2; // todo: rename centre
         vector<pair<xyz_t, xyz_t>> canvas = division(x1y1, x2y2);
         for (uint a = 0; a < daughter_count; a++) {
             node[a] = Node(dimension, nestedness + 1); // create a daughter node
-            // node[a].setFieldSize(canvas[a][0], canvas[a][1]);
             node[a].setFieldSize(canvas[a].first, canvas[a].second);
-            sum_mass += node[a].split2d(regions[a]); // recursion split the daughter node to the smaller nodes
+            sum_mass += node[a].splitSpace(regions[a]); // recursion split the daughter node to the smaller nodes
             
             // <> (debug and just a nice visualization) <>
-            printNodeSectors2d(canvas[a].first, canvas[a].second);
+            bool debugMode = false; //todo: remove
+            if (debugMode) {
+                switch (dimension) {
+                    case DIMENSION_2D: printNodeSectors2d(canvas[a].first, canvas[a].second); break;
+                    case DIMENSION_3D: printNodeSectors3d(canvas[a].first, canvas[a].second); break;
+                    default: break;
+                }
+            }
         }
     }
     mass_centre = Particle((x2y2 - x1y1) / 2 + x1y1, xyz_t(0, 0, 0), sum_mass);
@@ -176,44 +182,44 @@ float Node::split2d(vector<Particle> particles) {
 }
 
 
-float Node::split3d(vector<Particle> particles) {
-    daughter_count = 8;
-    if (particles.size() == 0) { // space without particles
-        mass_centre = Particle(xyz_t(0, 0, 0), xyz_t(0, 0, 0), 0.0f);
-        return 0.0f;
-    }
-    if (particles.size() == 1) { // space with only one particle
-        mass_centre = particles[0];
-        return particles[0].getMass();
-    }
+// float Node::split3d(vector<Particle> particles) {
+//     daughter_count = 8;
+//     if (particles.size() == 0) { // space without particles
+//         mass_centre = Particle(xyz_t(0, 0, 0), xyz_t(0, 0, 0), 0.0f);
+//         return 0.0f;
+//     }
+//     if (particles.size() == 1) { // space with only one particle
+//         mass_centre = particles[0];
+//         return particles[0].getMass();
+//     }
 
-    // find where are particles
-    node = make_unique<Node[]>(daughter_count);
-    vector<Particle> regions[daughter_count];
-    xyz_t node_size(x2y2 - x1y1); //todo: x1y1 --> x1y1z1
-    for (uint a = 0; a < particles.size(); a++) {
-        // remember where particle stays
-        uint kind = kindRegion(&particles[a]);
-        regions[kind].push_back(particles[a]);
-    }
+//     // find where are particles
+//     node = make_unique<Node[]>(daughter_count);
+//     vector<Particle> regions[daughter_count];
+//     xyz_t node_size(x2y2 - x1y1); //todo: x1y1 --> x1y1z1
+//     for (uint a = 0; a < particles.size(); a++) {
+//         // remember where particle stays
+//         uint kind = kindRegion(&particles[a]);
+//         regions[kind].push_back(particles[a]);
+//     }
 
-    // create the nodes and get a mass sum
-    float sum_mass = 0.0f;
-    if (nestedness < MAX_NESTEDNESS) {
-        vector<pair<xyz_t, xyz_t>> canvas = division(x1y1, x2y2);
-        for (uint a = 0; a < daughter_count; a++) {
-            node[a] = Node(dimension, nestedness + 1); // create a daughter node
-            node[a].setFieldSize(canvas[a].first, canvas[a].second);
-            sum_mass += node[a].split3d(regions[a]); // recursion split the daughter node to the smaller nodes
+//     // create the nodes and get a mass sum
+//     float sum_mass = 0.0f;
+//     if (nestedness < MAX_NESTEDNESS) {
+//         vector<pair<xyz_t, xyz_t>> canvas = division(x1y1, x2y2);
+//         for (uint a = 0; a < daughter_count; a++) {
+//             node[a] = Node(dimension, nestedness + 1); // create a daughter node
+//             node[a].setFieldSize(canvas[a].first, canvas[a].second);
+//             sum_mass += node[a].split3d(regions[a]); // recursion split the daughter node to the smaller nodes
             
-            // <> (debug and just a nice visualization) <>
-            printNodeSectors3d(canvas[a].first, canvas[a].second);
-        }
-    }
+//             // <> (debug and just a nice visualization) <>
+//             printNodeSectors3d(canvas[a].first, canvas[a].second);
+//         }
+//     }
 
-    mass_centre = Particle((x2y2 - x1y1) / 2 + x1y1, xyz_t(0, 0, 0), sum_mass);
-    return sum_mass;
-}
+//     mass_centre = Particle((x2y2 - x1y1) / 2 + x1y1, xyz_t(0, 0, 0), sum_mass);
+//     return sum_mass;
+// }
 
 void Node::printNodeSectors2d(xyz_t x1y1, xyz_t x2y2) { // print quad around every dot
     x1y1 = x1y1 / maxFieldSize;

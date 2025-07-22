@@ -30,12 +30,14 @@ class Node
 
         vector<pair<xyz_t, xyz_t>> division(xyz_t x1y1, xyz_t x2y2);
         uint kindRegion(Particle* particle);
-        float split2d(vector<Particle> particles);
-        float split3d(vector<Particle> particles);
+        // float split2d(vector<Particle> particles);
+        // float split3d(vector<Particle> particles);
+        float splitSpace(vector<Particle> particles);
 
         void printNodeSectors2d(xyz_t x1y1, xyz_t x2y2);
         void printNodeSectors3d(xyz_t x1y1, xyz_t x2y2);
         void printInfLine(xyz_t from, xyz_t to);
+
 
         double dist(xyz_t from, xyz_t to);
 

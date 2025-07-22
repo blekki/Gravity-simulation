@@ -5,7 +5,6 @@
 #include "cloud.h"
 
 void Cloud::newParticles() {
-    
     for (uint p = 0; p < PARTICLE_COUNT; p++) {
         xyz_t pos(0, 0, 0);
         for (uint axis = 0; axis < dimension; axis++) {
