@@ -19,7 +19,7 @@ bool Window::windowShouldClose() {
     return glfwWindowShouldClose(window); 
 }
 
-bool Window::isSimulationPause() { 
+bool Window::isSimulationOnPause() { 
     return sim_pause; 
 }
 

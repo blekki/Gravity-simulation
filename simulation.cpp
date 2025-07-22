@@ -41,7 +41,7 @@ int main() {
         window.preparationBeforeNextFrame();
 
         // all actions for changing the simulation stay
-        if (!window.isSimulationPause()) {
+        if (!window.isSimulationOnPause()) {
             camera.rotate();
             cloud.updateParticles();
         }

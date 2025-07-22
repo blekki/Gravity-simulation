@@ -23,7 +23,7 @@ class Window
         int getWidth();
         int getHeight();
         bool windowShouldClose();
-        bool isSimulationPause(); //todo: maybe rename "doesSimulationPause"
+        bool isSimulationOnPause(); //todo: maybe rename "doesSimulationPause"
         
         void swapBuffers();
         void preparationBeforeNextFrame();
