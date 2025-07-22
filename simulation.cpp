@@ -7,74 +7,51 @@
 #include <GL/glu.h>
 
 #include "enums.h"
+#include "window.h"
 #include "camera.h"
 #include "cloud2d.h"
 #include "cloud3d.h"
 
 using namespace std;
 
-// needy data
-const uint WIDTH = 1024;
-const uint HEIGHT = 720;
-bool sim_pause = true;
-
-static void key_callback(GLFWwindow *window, int key, int scancode, int action, int mods) { // call actions
-    // right now no one key callback exists
-    if (key == GLFW_KEY_SPACE && action == 1)
-        sim_pause = (sim_pause) ? false : true;
-    
-    if (key == GLFW_KEY_ESCAPE && action == 1)
-        glfwSetWindowShouldClose(window, true);
-}
-
 int main() {
+    // make each simulation randomly
     // srand(time(0)); // todo: uncomment
+
     // glfw initialization
     if (!glfwInit()) {
         cout << "Initialization failed" << endl;
         exit(EXIT_FAILURE);
     }
 
-    // window initialization
-    GLFWwindow* window = glfwCreateWindow(WIDTH, HEIGHT, "Space simulation", NULL, NULL);
-    if (!window) {
-        cout << "Window context creation failed" << endl;
-        exit(EXIT_FAILURE);
-    }
-    glfwMakeContextCurrent(window);
-    glfwSetKeyCallback(window, key_callback);
-    glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
-    glEnable(GL_DEPTH_TEST);
-    glEnable(GL_BLEND);
+    // view window initialization
+    Window window;
 
-    Camera camera(WIDTH, HEIGHT);
-    camera.updateMat();
+    // preparation to simulation. First frame
+    Camera camera(window.getWidth(), window.getHeight());
+    camera.updateMatrix();
 
-    Cloud3d cloud; //todo: CloudFactory
+    Cloud3d cloud; //todo: make it as CloudFactory
     cloud.newParticles();
     cloud.print();
-    glfwSwapBuffers(window);
+    window.swapBuffers();
 
-    // basic loop
-    while (!glfwWindowShouldClose(window)) {
-        if (!sim_pause) {
-            glViewport(0, 0, WIDTH, HEIGHT); // resize window
-            
-            // camera.rotate();
-            
-            
-            glClear(GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT); // clear scene
+    // in time frames rendering
+    while (!window.windowShouldClose()) {
+        window.preparationBeforeNextFrame();
 
-            // print particles
+        // all actions for changing the simulation stay
+        if (!window.isSimulationPause()) {
+            camera.rotate();
             cloud.updateParticles();
-            cloud.print();
-
-            // other
-            glfwSwapBuffers(window);
         }
-        glfwPollEvents();
-    }
+        // todo: make possibility freeze simulation, but keep camera moves (so cool effect)
 
-    // before exit 
-    glfwDestroyWindow(window);
+        // frame render
+        cloud.print();
+        window.swapBuffers();
+
+        // other needy manipulation
+        window.pollEvents();
+    }
 }

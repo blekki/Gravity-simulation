@@ -10,7 +10,7 @@ class Camera
         uint height;
 
     public:
-        void updateMat() {
+        void updateMatrix() {
             glLoadIdentity();
             glMatrixMode(GL_PROJECTION);
 
