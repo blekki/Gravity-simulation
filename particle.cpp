@@ -3,25 +3,17 @@
 
 #include "iostream"
 
-void Particle::setPos(xyz_t pos) {
-    this->pos = pos;
-}
-
-void Particle::setSpeed(xyz_t speed) {
-    this->speed = speed;
-}
-
-void Particle::addSpeed(xyz_t speed) {
-    this->speed += speed;
-}
+void Particle::setPos(Coord pos) { this->pos = pos; }
+void Particle::setSpeed(Coord speedVec) { this->speedVec = speedVec; }
+void Particle::addSpeed(Coord speedVec) { this->speedVec += speedVec; }
 
 float Particle::getX() { return pos.x; }
 float Particle::getY() { return pos.y; }
 float Particle::getZ() { return pos.z; }
-xyz_t Particle::getXYZ() { return pos; }
-xyz_t Particle::getSpeed() { return speed; }
+Coord Particle::getPos() { return pos; }
+Coord Particle::getSpeed() { return speedVec; }
 float Particle::getMass() {return mass; }
 
 void Particle::updatePos() {
-    pos += speed;
+    pos += speedVec;
 }
