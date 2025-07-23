@@ -14,10 +14,10 @@ void Coord::normalize() {
 }
 
 void Coord::axesPermutation() {
-    float a = this->x;
-    this->x = this->y;
-    this->y = this->z;
-    this->z = a;
+    float a = this->z;
+    this->z = this->y;
+    this->y = this->x;
+    this->x = a;
 }
 
 double Coord::diagonaleSq() {
