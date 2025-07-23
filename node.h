@@ -2,6 +2,7 @@
 
 #include "stdlib.h"
 #include <GL/gl.h>
+#include "math.h"
 #include "vector"
 #include "memory"
 
@@ -26,17 +27,7 @@ class Node
         static long long int fistParrentFieldSize; // max particles position from centre
         static constexpr float SIMULATION_QUALITY_COEF = 1.0f; // calculation accuracy (node size / dist > coef)
 
-    private: 
-        // vector<pair<Coord, Coord>> division(Coord startCoord, Coord finishCoord); // todo: rename
-        // uint kindRegion(Particle* particle); // todo: rename whichRegion
-        // float splitSpace(vector<Particle> particles);
-
-        // void printNodeSectors2d(Coord startCoord, Coord finishCoord); // todo: made only one node printer
-        // void printNodeSectors3d(Coord startCoord, Coord finishCoord);
-        // void printInfLine(Coord from, Coord to); // todo: rename into "printInfluenceLines"
-
-        // double dist(Coord from, Coord to); // todo: rename to "distance"
-
+    private:
         vector<pair<Coord, Coord>> division(); // todo: rename
         uint whatKindRegion(Particle* particle); // todo: rename whichRegion
         float splitSpace(vector<Particle> particles); // todo: rename split
@@ -46,7 +37,7 @@ class Node
         void printInfLine(Coord from, Coord to); // todo: rename into "printInfluenceLines"
 
         double distance(Coord from, Coord to); // todo: rename to "distance"
-        Coord addToEveryAxes(Coord coord, float value);
+        Coord addToEveryAxes(Coord vec, float value);
         void setDaughterFieldSize(Coord sizeFrom, Coord sizeTo);
 
     public:
@@ -57,12 +48,12 @@ class Node
         Coord gravityCalc(Particle* particle); // todo: rename
 
         Node(Dimension dimension, uint nestedness)
-        : dimension(dimension), nestedness(nestedness)
-        {}
+        : dimension(dimension), nestedness(nestedness) 
+        { daughterNodeCount = pow(2, (uint) dimension); }
         
         Node(Dimension dimension)
         : dimension(dimension), nestedness(0)
-        {}
+        { daughterNodeCount = pow(2, (uint) dimension); }
 
-        Node(){}
+        Node(){ daughterNodeCount = pow(2, (uint) dimension); }
 };

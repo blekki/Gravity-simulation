@@ -10,7 +10,7 @@ long long int Node::fistParrentFieldSize;
 void Node::setFieldSize(Coord sizeFrom, Coord sizeTo) {
     this->sizeFrom = sizeFrom;
     this->sizeTo   = sizeTo;
-    fistParrentFieldSize = sizeTo.x; // can be used each coordTo axis
+    fistParrentFieldSize = sizeTo.x; // ps: can be used each "sizeTo" axis
 }
 
 void Node::setDaughterFieldSize(Coord sizeFrom, Coord sizeTo) {
@@ -23,11 +23,11 @@ double Node::distance(Coord from, Coord to) {
     return sqrt(dist);
 }
 
-Coord Node::addToEveryAxes(Coord coord, float value) {
+Coord Node::addToEveryAxes(Coord vec, float value) {
     Coord result;
-    result.x = coord.x + value;
-    result.y = coord.y + value;
-    result.z = coord.z + value;
+    result.x = vec.x + value;
+    result.y = vec.y + value;
+    result.z = vec.z + value;
     return result;
 }
 
@@ -62,7 +62,7 @@ Coord Node::gravityCalc(Particle* particle) {
     if (r / s > SIMULATION_QUALITY_COEF || last_level) {
         float G = 6.6742E-13; // right vesion is 6.6742E-11
         // float G = 6.6742E-9;
-        double gravity = (G * particle->getMass() * mass_centre.getMass()) / r; // todo: r --> (r * r)
+        double gravity = (G * particle->getMass() * mass_centre.getMass()) / (r); // todo: r --> (r * r)
 
         Coord vec = mass_centre.getPos() - particle->getPos();
         float k = gravity / r;
@@ -93,10 +93,13 @@ vector<pair<Coord, Coord>> Node::division() {
     // Example:
     // for 2d dimension world do it 2 times (result = split space to 4 smaller spaces)
     // for 3d dimension world do it 3 times (result = split space to 8 smaller spaces)
-    const int MAX_LAMBDA_LAYER = dimension;
-    function<void(Coord, Coord, int)> mirror;
+    
+    const int MAX_LAYER = dimension;
+    // because fuction must be called the same times as dimension value. One time for each axis
+
+    function<void(Coord, Coord, int)> mirror; // todo: rename
     mirror = [&](Coord pos, Coord offset, int layer) {
-        if (layer == MAX_LAMBDA_LAYER) { // centre into x1y1, x2y2
+        if (layer == MAX_LAYER) {
             Coord coord1 = addToEveryAxes(pos, -quarter);
             Coord coord2 = addToEveryAxes(pos,  quarter);
             blocks.push_back(pair(coord1, coord2)); // save results
@@ -109,7 +112,7 @@ vector<pair<Coord, Coord>> Node::division() {
         offset.axesPermutation();
         layer++;
         mirror(minus, offset, layer);
-        mirror(plus, offset, layer);
+        mirror(plus,  offset, layer);
     };
     mirror(center, offset, FIRST_LAYER);
 
@@ -118,7 +121,7 @@ vector<pair<Coord, Coord>> Node::division() {
 
 uint Node::whatKindRegion(Particle* particle) {
     Coord coord = particle->getPos();
-    Coord node_size(sizeFrom - sizeTo);
+    Coord node_size(sizeTo - sizeFrom);
 
     int kind = daughterNodeCount;
     int max_index = dimension - 1;
@@ -144,7 +147,6 @@ void Node::split(vector<Particle> particles) {
 }
 
 float Node::splitSpace(vector<Particle> particles) {
-    daughterNodeCount = pow(2, (uint) dimension);
     if (particles.size() == 0) { // space without particles
         mass_centre = Particle(Coord(0, 0, 0), Coord(0, 0, 0), 0.0f);
         return 0.0f;
@@ -157,7 +159,7 @@ float Node::splitSpace(vector<Particle> particles) {
     // find where are particles
     daughterNodes = make_unique<Node[]>(daughterNodeCount);
     vector<Particle> regions[daughterNodeCount];
-    Coord node_size(sizeTo - sizeFrom); //todo: x1y1 --> x1y1z1
+    Coord node_size(sizeTo - sizeFrom);
     for (uint a = 0; a < particles.size(); a++) {
         // inside what kind quad is particle
         uint kind = whatKindRegion(&particles[a]);
@@ -166,7 +168,7 @@ float Node::splitSpace(vector<Particle> particles) {
 
     // create the nodes and get a mass sum
     float sum_mass = 0.0f;
-    if (nestedness < MAX_LAYER) {
+    if (nestedness < MAX_NESTEDNESS) {
         vector<pair<Coord, Coord>> canvas = division();
         for (uint a = 0; a < daughterNodeCount; a++) {
             daughterNodes[a] = Node(dimension, nestedness + 1); // create a daughter node
@@ -174,7 +176,7 @@ float Node::splitSpace(vector<Particle> particles) {
             sum_mass += daughterNodes[a].splitSpace(regions[a]); // recursion split the daughter node to the smaller nodes
             
             // <> (debug and just a nice visualization) <>
-            bool debugMode = true; //todo: remove
+            bool debugMode = false; //todo: remove and make another method
             if (debugMode) {
                 switch (dimension) {
                     case DIMENSION_2D: printNodeSectors2d(canvas[a].first, canvas[a].second); break;
@@ -203,6 +205,7 @@ void Node::printNodeSectors2d(Coord x1y1, Coord x2y2) { // print quad around eve
     glEnd();
 }
 
+// todo: rename parameters
 void Node::printNodeSectors3d(Coord x1y1, Coord x2y2) { // print cube around every dot
     x1y1 = x1y1 / fistParrentFieldSize;
     x2y2 = x2y2 / fistParrentFieldSize;

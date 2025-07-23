@@ -9,5 +9,6 @@ enum Dimension
 enum Layers
 {
     FIRST_LAYER = 0,
-    MAX_LAYER = 20
+    MAX_LAYER = 20,
+    MAX_NESTEDNESS = MAX_LAYER
 };
