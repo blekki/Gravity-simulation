@@ -28,12 +28,12 @@ class Node
         static constexpr float SIMULATION_QUALITY_COEF = 1.0f; // accuracy calculation
 
     private:
-        vector<pair<Coord, Coord>> getDaughterSpaces(); // todo: rename
-        uint whatKindRegion(Particle* particle);
-        float createDaughters(vector<Particle> particles); // todo: rename split
-
         double distance(Coord from, Coord to);
         Coord addToEveryAxes(Coord vec, float value);
+
+        uint whatKindRegion(Particle* particle);
+        float createDaughters(vector<Particle> particles);
+        vector<pair<Coord, Coord>> getDaughterSpaces();
         void setDaughterField(Coord sizeFrom, Coord sizeTo);
 
         Node(Dimension dimension, uint nestedness);
