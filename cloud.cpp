@@ -19,8 +19,9 @@ void Cloud::newParticles() {
 
 void Cloud::updateParticles() {
     this->node = make_unique<Node>(dimension);
-    this->node->setFieldSize(Coord(-SPACE_SIZE, -SPACE_SIZE, -SPACE_SIZE), Coord(SPACE_SIZE, SPACE_SIZE, SPACE_SIZE));
-    this->node->split(particles);
+    // todo: make field size from class variables. Not inizialize it here
+    this->node->setField(Coord(-SPACE_SIZE, -SPACE_SIZE, -SPACE_SIZE), Coord(SPACE_SIZE, SPACE_SIZE, SPACE_SIZE));
+    this->node->splitter(particles);
     
     for (uint i = 0; i < particles.size(); i++) {
         Coord vec = node->gravityCalc(&particles[i]);

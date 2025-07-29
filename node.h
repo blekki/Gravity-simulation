@@ -1,10 +1,10 @@
 #pragma once
 
 #include "stdlib.h"
-#include <GL/gl.h>
 #include "math.h"
 #include "vector"
 #include "memory"
+#include <GL/gl.h>
 
 #include "enums.h"
 #include "particle.h"
@@ -14,46 +14,42 @@ using namespace std;
 
 class Node
 {   
-    private: // todo: sort variables
+    private:
         Dimension   dimension;
-        Coord       sizeFrom, sizeTo; // it's a space from x1y1..n1 to x2y2..n2 points
-        Particle    mass_centre;
+        Coord       sizeFrom, sizeTo; // it's a space between x1y1..n1 and x2y2..n2 points
         uint        nestedness; // current daughter node level
         
         uint daughterCount;
-        unique_ptr<Node[]> daughters; // daughter nodes = 4 (2d dimension) or 8 (3d dimension) and etc.
+        unique_ptr<Node[]> daughters; // daughters = 4 (2d dimension) or 8 (3d dimension) and etc.
+        
+        Particle    mass_centre;
 
-        // todo: remove
-        static long long int fistParrentFieldSize; // max particles position from centre
-        static constexpr float SIMULATION_QUALITY_COEF = 1.0f; // calculation accuracy (node size / dist > coef)
+        static long long int primalFieldSize; // size of first parrent node
+        static constexpr float SIMULATION_QUALITY_COEF = 1.0f; // accuracy calculation
 
     private:
-        vector<pair<Coord, Coord>> division(); // todo: rename
-        uint whatKindRegion(Particle* particle); // todo: rename whichRegion
-        float splitSpace(vector<Particle> particles); // todo: rename split
-
-        void printNodeSectors2d(Coord sizeFrom, Coord sizeTo); // todo: made only one node printer
-        void printNodeSectors3d(Coord sizeFrom, Coord sizeTo);
-        void printInfLine(Coord from, Coord to); // todo: rename into "printInfluenceLines"
+        vector<pair<Coord, Coord>> getDaughterSpaces(); // todo: rename
+        uint whatKindRegion(Particle* particle);
+        float createDaughters(vector<Particle> particles); // todo: rename split
 
         double distance(Coord from, Coord to);
         Coord addToEveryAxes(Coord vec, float value);
-        void setDaughterFieldSize(Coord sizeFrom, Coord sizeTo);
+        void setDaughterField(Coord sizeFrom, Coord sizeTo);
+
+        Node(Dimension dimension, uint nestedness);
+
+        // visual graphic for debug
+        void printNodeSectors2d(Coord sizeFrom, Coord sizeTo); // todo: need update
+        void printNodeSectors3d(Coord sizeFrom, Coord sizeTo);
+        void printInfluenceLines(Coord from, Coord to);
 
     public:
-        void setFieldSize(Coord sizeFrom, Coord sizeTo);
-        void split(vector<Particle> particles);
+        void setField(Coord sizeFrom, Coord sizeTo);
+        void splitter(vector<Particle> particles);
 
-        Coord oldGravityCalc(Particle* from, Particle* to); // todo: rename
-        Coord gravityCalc(Particle* particle); // todo: rename
-
-        Node(Dimension dimension, uint nestedness)
-        : dimension(dimension), nestedness(nestedness) 
-        { daughterCount = pow(2, (uint) dimension); }
+        Coord oldGravityCalc(Particle* from, Particle* to);
+        Coord gravityCalc(Particle* particle);
         
-        Node(Dimension dimension)
-        : dimension(dimension), nestedness(0)
-        { daughterCount = pow(2, (uint) dimension); }
-
-        Node(){ daughterCount = pow(2, (uint) dimension); }
+        Node(Dimension dimension);
+        Node();
 };
