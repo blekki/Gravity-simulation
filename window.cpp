@@ -15,7 +15,7 @@ void Window::key_callback(GLFWwindow *window, int key, int scancode, int action,
 int Window::getWidth() { return width; }
 int Window::getHeight() { return height; }
 
-bool Window::windowShouldClose() { 
+bool Window::shouldClose() { 
     return glfwWindowShouldClose(window); 
 }
 

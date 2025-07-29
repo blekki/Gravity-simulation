@@ -52,8 +52,8 @@ Coord Node::gravityCalc(Particle* particle) {
 
     // part of barnes-hut algorithm
     bool last_level = true;
-    for (uint a = 0; a < daughterNodeCount; a++)
-        if (daughterNodes.get()) {
+    for (uint a = 0; a < daughterCount; a++)
+        if (daughters.get()) {
             last_level = false; 
             break;
         }
@@ -71,9 +71,9 @@ Coord Node::gravityCalc(Particle* particle) {
         // todo: reduild gravity power calculation
     }
     else {
-        for (uint a = 0; a < daughterNodeCount; a++) {
-            if (daughterNodes.get())
-                gravity_vec += daughterNodes[a].gravityCalc(particle);
+        for (uint a = 0; a < daughterCount; a++) {
+            if (daughters.get())
+                gravity_vec += daughters[a].gravityCalc(particle);
         }
     }
 
@@ -123,7 +123,7 @@ uint Node::whatKindRegion(Particle* particle) {
     Coord coord = particle->getPos();
     Coord node_size(sizeTo - sizeFrom);
 
-    int kind = daughterNodeCount;
+    int kind = daughterCount;
     int max_index = dimension - 1;
     for (int index = max_index - 1; index >= 0; index--) {
         float center = node_size.getAxis(index) / 2 + sizeFrom.getAxis(index);
@@ -138,11 +138,6 @@ uint Node::whatKindRegion(Particle* particle) {
 }
 
 void Node::split(vector<Particle> particles) {
-    // switch (dimension) {
-    //     case DIMENSION_2D: split2d(particles); break;
-    //     case DIMENSION_3D: split3d(particles); break;
-    //     default: break;
-    // }
     splitSpace(particles);
 }
 
@@ -157,8 +152,8 @@ float Node::splitSpace(vector<Particle> particles) {
     }
 
     // find where are particles
-    daughterNodes = make_unique<Node[]>(daughterNodeCount);
-    vector<Particle> regions[daughterNodeCount];
+    daughters = make_unique<Node[]>(daughterCount);
+    vector<Particle> regions[daughterCount];
     Coord node_size(sizeTo - sizeFrom);
     for (uint a = 0; a < particles.size(); a++) {
         // inside what kind quad is particle
@@ -170,10 +165,10 @@ float Node::splitSpace(vector<Particle> particles) {
     float sum_mass = 0.0f;
     if (nestedness < MAX_NESTEDNESS) {
         vector<pair<Coord, Coord>> canvas = division();
-        for (uint a = 0; a < daughterNodeCount; a++) {
-            daughterNodes[a] = Node(dimension, nestedness + 1); // create a daughter node
-            daughterNodes[a].setDaughterFieldSize(canvas[a].first, canvas[a].second);
-            sum_mass += daughterNodes[a].splitSpace(regions[a]); // recursion split the daughter node to the smaller nodes
+        for (uint a = 0; a < daughterCount; a++) {
+            daughters[a] = Node(dimension, nestedness + 1); // create a daughter node
+            daughters[a].setDaughterFieldSize(canvas[a].first, canvas[a].second);
+            sum_mass += daughters[a].splitSpace(regions[a]); // recursion split the daughter node to the smaller nodes
             
             // <> (debug and just a nice visualization) <>
             bool debugMode = false; //todo: remove and make another method

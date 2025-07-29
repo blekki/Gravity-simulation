@@ -27,4 +27,6 @@ void Cloud::updateParticles() {
         particles[i].addSpeed(vec);
         particles[i].updatePos();
     }
+
+    // author comment: perspective position for printing debug grids 
 }

@@ -22,7 +22,7 @@ class Window
     public:
         int getWidth();
         int getHeight();
-        bool windowShouldClose();
+        bool shouldClose();
         bool isSimulationOnPause(); //todo: maybe rename "doesSimulationPause"
         
         void swapBuffers();

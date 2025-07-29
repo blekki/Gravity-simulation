@@ -16,12 +16,12 @@ class Node
 {   
     private: // todo: sort variables
         Dimension   dimension;
-        Coord       sizeFrom, sizeTo; // todo: maybe rename
+        Coord       sizeFrom, sizeTo; // it's a space from x1y1..n1 to x2y2..n2 points
         Particle    mass_centre;
         uint        nestedness; // current daughter node level
         
-        unique_ptr<Node[]> daughterNodes; // daughter nodes = 4 (2d dimension) or 8 (3d dimension)
-        uint daughterNodeCount;
+        uint daughterCount;
+        unique_ptr<Node[]> daughters; // daughter nodes = 4 (2d dimension) or 8 (3d dimension) and etc.
 
         // todo: remove
         static long long int fistParrentFieldSize; // max particles position from centre
@@ -36,7 +36,7 @@ class Node
         void printNodeSectors3d(Coord sizeFrom, Coord sizeTo);
         void printInfLine(Coord from, Coord to); // todo: rename into "printInfluenceLines"
 
-        double distance(Coord from, Coord to); // todo: rename to "distance"
+        double distance(Coord from, Coord to);
         Coord addToEveryAxes(Coord vec, float value);
         void setDaughterFieldSize(Coord sizeFrom, Coord sizeTo);
 
@@ -49,11 +49,11 @@ class Node
 
         Node(Dimension dimension, uint nestedness)
         : dimension(dimension), nestedness(nestedness) 
-        { daughterNodeCount = pow(2, (uint) dimension); }
+        { daughterCount = pow(2, (uint) dimension); }
         
         Node(Dimension dimension)
         : dimension(dimension), nestedness(0)
-        { daughterNodeCount = pow(2, (uint) dimension); }
+        { daughterCount = pow(2, (uint) dimension); }
 
-        Node(){ daughterNodeCount = pow(2, (uint) dimension); }
+        Node(){ daughterCount = pow(2, (uint) dimension); }
 };

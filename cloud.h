@@ -27,7 +27,7 @@ class Cloud
     public:
         void newParticles();
         // todo: create a method for a creating particles with a speed
-        void updateParticles();
+        void updateParticles(); // todo: rename "updateFrame" or something as that
 
         Cloud(Dimension dimension)
         : dimension(dimension)
