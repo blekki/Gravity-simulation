@@ -31,9 +31,9 @@ class Node
         double distance(Coord from, Coord to);
         Coord addToEveryAxes(Coord vec, float value);
 
+        vector<pair<Coord, Coord>> getDaughterSpaces();
         uint whatKindRegion(Particle* particle);
         float createDaughters(vector<Particle> particles);
-        vector<pair<Coord, Coord>> getDaughterSpaces();
         void setDaughterField(Coord sizeFrom, Coord sizeTo);
 
         Node(Dimension dimension, uint nestedness);
