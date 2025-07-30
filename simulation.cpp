@@ -49,6 +49,7 @@ int main() {
         // todo: make possibility freeze simulation, but keep camera moves (so cool effect)
 
         // frame render
+        cloud.printNodeSectors();
         cloud.print();
         window.swapBuffers();
 

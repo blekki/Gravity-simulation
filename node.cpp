@@ -55,7 +55,7 @@ Coord Node::gravityCalc(Particle* particle) {
 
     // part of Barnes-Hut algorithm
     bool last_level = true;
-    for (uint a = 0; a < daughterCount; a++)
+    for (uint a = 0; a < daughterCount; a++) // todo: perspective remove place
         if (daughters.get()) {
             last_level = false; 
             break;
@@ -187,14 +187,14 @@ float Node::createDaughters(vector<Particle> particles) {
             sum_mass += daughters[a].createDaughters(particlePacks[a]); // recursion split the daughter node to the smaller nodes
             
             // <> (debug and just a nice visualization) <>
-            bool debugMode = false; //todo: remove and make another method
-            if (debugMode) {
-                switch (dimension) {
-                    case DIMENSION_2D: printNodeSectors2d(spaces[a].first, spaces[a].second); break;
-                    case DIMENSION_3D: printNodeSectors3d(spaces[a].first, spaces[a].second); break;
-                    default: break;
-                }
-            }
+            // bool debugMode = false; //todo: remove and make another method
+            // if (debugMode) {
+            //     switch (dimension) {
+            //         case DIMENSION_2D: printNodeSectors2d(spaces[a].first, spaces[a].second); break;
+            //         case DIMENSION_3D: printNodeSectors3d(spaces[a].first, spaces[a].second); break;
+            //         default: break;
+            //     }
+            // }
         }
     }
     mass_centre = Particle((sizeTo - sizeFrom) / 2 + sizeFrom, Coord(0, 0, 0), sum_mass);
@@ -202,51 +202,68 @@ float Node::createDaughters(vector<Particle> particles) {
 }
 
 
-void Node::printNodeSectors2d(Coord x1y1, Coord x2y2) { // print quad around every dot
-    x1y1 = x1y1 / primalFieldSize;
-    x2y2 = x2y2 / primalFieldSize;
+void Node::printNodeSectors2d() { // print quad around node space
+    Coord from = sizeFrom / primalFieldSize;
+    Coord to   = sizeTo   / primalFieldSize;
     const float brightness = 0.3f;
     glColor3f(brightness, brightness, brightness);
     glBegin(GL_LINE_STRIP);
-    glVertex2f(x1y1.x, x1y1.y);
-    glVertex2f(x1y1.x, x2y2.y);
-    glVertex2f(x2y2.x, x2y2.y);
-    glVertex2f(x2y2.x, x1y1.y);
-    glVertex2f(x1y1.x, x1y1.y);
+    glVertex2f(from.x, from.y);
+    glVertex2f(from.x, to.y  );
+    glVertex2f(to.x,   to.y  );
+    glVertex2f(to.x,   from.y);
+    glVertex2f(from.x, from.y);
     glEnd();
+
+    // if (daughters.get())
+    for (uint i = 0; i < daughterCount; i++)
+        if (daughters.get())
+            daughters[i].printNodeSectors2d();
 }
 
 // todo: rename parameters
-void Node::printNodeSectors3d(Coord x1y1, Coord x2y2) { // print cube around every dot
-    x1y1 = x1y1 / primalFieldSize;
-    x2y2 = x2y2 / primalFieldSize;
+void Node::printNodeSectors3d() { // print cube around node space
+    Coord from = sizeFrom / primalFieldSize;
+    Coord to   = sizeTo   / primalFieldSize;
     const float brightness = 0.3f;
     glColor3f(brightness, brightness, brightness);
     glBegin(GL_LINE_STRIP);
     // iter 1
-    glVertex3f(x1y1.x, x1y1.y, x1y1.z);
-    glVertex3f(x1y1.x, x2y2.y, x1y1.z);
-    glVertex3f(x2y2.x, x2y2.y, x1y1.z);
-    glVertex3f(x2y2.x, x1y1.y, x1y1.z);
-    glVertex3f(x1y1.x, x1y1.y, x1y1.z);
+    glVertex3f(from.x, from.y, from.z);
+    glVertex3f(from.x, to.y, from.z);
+    glVertex3f(to.x, to.y, from.z);
+    glVertex3f(to.x, from.y, from.z);
+    glVertex3f(from.x, from.y, from.z);
     // iter 2
-    glVertex3f(x1y1.x, x1y1.y, x2y2.z);
-    glVertex3f(x1y1.x, x2y2.y, x2y2.z);
-    glVertex3f(x1y1.x, x2y2.y, x1y1.z);
+    glVertex3f(from.x, from.y, to.z);
+    glVertex3f(from.x, to.y, to.z);
+    glVertex3f(from.x, to.y, from.z);
     // iter 3
-    glVertex3f(x2y2.x, x2y2.y, x1y1.z);
-    glVertex3f(x2y2.x, x2y2.y, x2y2.z);
-    glVertex3f(x1y1.x, x2y2.y, x2y2.z);
+    glVertex3f(to.x, to.y, from.z);
+    glVertex3f(to.x, to.y, to.z);
+    glVertex3f(from.x, to.y, to.z);
     // iter 3
-    glVertex3f(x1y1.x, x1y1.y, x2y2.z);
-    glVertex3f(x2y2.x, x1y1.y, x2y2.z);
-    glVertex3f(x2y2.x, x2y2.y, x2y2.z);
+    glVertex3f(from.x, from.y, to.z);
+    glVertex3f(to.x, from.y, to.z);
+    glVertex3f(to.x, to.y, to.z);
     // iter 3
-    glVertex3f(x2y2.x, x2y2.y, x1y1.z);
-    glVertex3f(x2y2.x, x1y1.y, x1y1.z);
-    glVertex3f(x2y2.x, x1y1.y, x2y2.z);
+    glVertex3f(to.x, to.y, from.z);
+    glVertex3f(to.x, from.y, from.z);
+    glVertex3f(to.x, from.y, to.z);
     glEnd();
+    
+    if (daughters.get())
+        for (uint i = 0; i < daughterCount; i++)
+            daughters[i].printNodeSectors3d();
 }
+
+// void Node::printAllSectors() {
+//     switch (dimension) {
+//         case DIMENSION_2D: printNodeSectors2d(); break;
+//         case DIMENSION_3D: printNodeSectors3d(); break;
+//         default: break;
+//     }
+// }
 
 void Node::printInfluenceLines(Coord from, Coord to) {
     from = from / primalFieldSize;

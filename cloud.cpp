@@ -30,15 +30,17 @@ void Cloud::newParticles() {
 }
 
 void Cloud::updateParticles() {
-    this->node = make_unique<Node>(dimension);
-    this->node->setField(nodeSizeFromCenter * -1.0f, nodeSizeFromCenter);
-    this->node->splitter(particles);
+    node = make_unique<Node>(dimension);
+    node->setField(nodeSizeFromCenter * -1.0f, nodeSizeFromCenter);
+    node->splitter(particles);
     
     for (uint i = 0; i < particles.size(); i++) {
         Coord vec = node->gravityCalc(&particles[i]);
         particles[i].addSpeed(vec);
         particles[i].updatePos();
     }
-
-    // author comment: perspective position for printing debug grids
 }
+
+// void Cloud::printNodeSectors() {
+//     node->printAllSectors();
+// }

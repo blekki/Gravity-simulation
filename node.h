@@ -38,17 +38,17 @@ class Node
 
         Node(Dimension dimension, uint nestedness);
 
-        // visual graphic for debug
-        void printNodeSectors2d(Coord sizeFrom, Coord sizeTo); // todo: need update
-        void printNodeSectors3d(Coord sizeFrom, Coord sizeTo);
-        void printInfluenceLines(Coord from, Coord to);
-
     public:
         void setField(Coord sizeFrom, Coord sizeTo);
         void splitter(vector<Particle> particles);
 
         Coord oldGravityCalc(Particle* from, Particle* to);
         Coord gravityCalc(Particle* particle);
+
+        // visual graphic for debug
+        void printNodeSectors2d(); // todo: need update
+        void printNodeSectors3d();
+        void printInfluenceLines(Coord from, Coord to);
         
         Node(Dimension dimension);
         Node();

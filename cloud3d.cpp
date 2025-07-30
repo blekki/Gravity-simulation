@@ -12,3 +12,7 @@ void Cloud3d::print() {
     }
     glEnd();
 }
+
+void Cloud3d::printNodeSectors() {
+    node->printNodeSectors3d();
+}
