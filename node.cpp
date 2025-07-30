@@ -49,7 +49,7 @@ Coord Node::gravityCalc(Particle* particle) {
     
     float s = distance(sizeFrom, sizeTo);
     float r = distance(particle->getPos(), mass_centre.getPos());
-    // if particle try to attract itself, zero influence
+    // if particle try to attract itself, return zero influence
     if (r == 0)
         return Coord(0, 0, 0);
 
@@ -185,16 +185,6 @@ float Node::createDaughters(vector<Particle> particles) {
             daughters[a] = Node(dimension, nestedness + 1); // create a daughter node
             daughters[a].setDaughterField(spaces[a].first, spaces[a].second);
             sum_mass += daughters[a].createDaughters(particlePacks[a]); // recursion split the daughter node to the smaller nodes
-            
-            // <> (debug and just a nice visualization) <>
-            // bool debugMode = false; //todo: remove and make another method
-            // if (debugMode) {
-            //     switch (dimension) {
-            //         case DIMENSION_2D: printNodeSectors2d(spaces[a].first, spaces[a].second); break;
-            //         case DIMENSION_3D: printNodeSectors3d(spaces[a].first, spaces[a].second); break;
-            //         default: break;
-            //     }
-            // }
         }
     }
     mass_centre = Particle((sizeTo - sizeFrom) / 2 + sizeFrom, Coord(0, 0, 0), sum_mass);
@@ -215,7 +205,6 @@ void Node::printNodeSectors2d() { // print quad around node space
     glVertex2f(from.x, from.y);
     glEnd();
 
-    // if (daughters.get())
     for (uint i = 0; i < daughterCount; i++)
         if (daughters.get())
             daughters[i].printNodeSectors2d();
@@ -230,24 +219,24 @@ void Node::printNodeSectors3d() { // print cube around node space
     glBegin(GL_LINE_STRIP);
     // iter 1
     glVertex3f(from.x, from.y, from.z);
-    glVertex3f(from.x, to.y, from.z);
-    glVertex3f(to.x, to.y, from.z);
-    glVertex3f(to.x, from.y, from.z);
+    glVertex3f(from.x, to.y,   from.z);
+    glVertex3f(to.x,   to.y,   from.z);
+    glVertex3f(to.x,   from.y, from.z);
     glVertex3f(from.x, from.y, from.z);
     // iter 2
     glVertex3f(from.x, from.y, to.z);
-    glVertex3f(from.x, to.y, to.z);
-    glVertex3f(from.x, to.y, from.z);
+    glVertex3f(from.x, to.y,   to.z);
+    glVertex3f(from.x, to.y,   from.z);
     // iter 3
-    glVertex3f(to.x, to.y, from.z);
-    glVertex3f(to.x, to.y, to.z);
-    glVertex3f(from.x, to.y, to.z);
-    // iter 3
+    glVertex3f(to.x,   to.y,   from.z);
+    glVertex3f(to.x,   to.y,   to.z);
+    glVertex3f(from.x, to.y,   to.z);
+    // iter 4
     glVertex3f(from.x, from.y, to.z);
-    glVertex3f(to.x, from.y, to.z);
-    glVertex3f(to.x, to.y, to.z);
-    // iter 3
-    glVertex3f(to.x, to.y, from.z);
+    glVertex3f(to.x,   from.y, to.z);
+    glVertex3f(to.x,   to.y,   to.z);
+    // iter 5
+    glVertex3f(to.x, to.y,   from.z);
     glVertex3f(to.x, from.y, from.z);
     glVertex3f(to.x, from.y, to.z);
     glEnd();
@@ -256,14 +245,6 @@ void Node::printNodeSectors3d() { // print cube around node space
         for (uint i = 0; i < daughterCount; i++)
             daughters[i].printNodeSectors3d();
 }
-
-// void Node::printAllSectors() {
-//     switch (dimension) {
-//         case DIMENSION_2D: printNodeSectors2d(); break;
-//         case DIMENSION_3D: printNodeSectors3d(); break;
-//         default: break;
-//     }
-// }
 
 void Node::printInfluenceLines(Coord from, Coord to) {
     from = from / primalFieldSize;
@@ -277,14 +258,14 @@ void Node::printInfluenceLines(Coord from, Coord to) {
 
 // ### CONSTRUCTORS ###
 
-// private
+// private:
 Node::Node(Dimension dimension, uint nestedness) {
     this->dimension = dimension;
     this->nestedness = nestedness;
     this->daughterCount = pow(2, (uint) dimension); 
 }
 
-// public
+// public:
 Node::Node(Dimension dimension) {
     this->dimension = dimension;
     this->nestedness = 0;

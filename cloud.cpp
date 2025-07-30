@@ -11,20 +11,16 @@ void Cloud::setDrawingProp() {
 
 void Cloud::newParticles() {
     for (uint p = 0; p < PARTICLE_COUNT; p++) {
+        // position
         Coord pos(0.0f, 0.0f, 0.0f);
         for (uint axis = 0; axis < dimension; axis++) {
             float value = rand() % (SPACE_SIZE) * 2.0f - SPACE_SIZE;
             pos.setAxis(axis, value);
         }
-        
-        // float coords[DIMENSION_MAX];
-        // for (uint axis = 0; axis < dimension; axis++)
-        //     coords[axis] = rand() % (SPACE_SIZE) * 2.0f - SPACE_SIZE;
-        // for (uint other_axis = dimension; other_axis < DIMENSION_MAX; other_axis++)
-        //     coords[other_axis] = 0.0f;
-        
-        // Coord pos(coords[0], coords[1], coords[2]);
+        // speed
         Coord speed(0.0f, 0.0f, 0.0f);
+        
+        // push
         particles.push_back(Particle(pos, speed));
     }
 }
@@ -40,7 +36,3 @@ void Cloud::updateParticles() {
         particles[i].updatePos();
     }
 }
-
-// void Cloud::printNodeSectors() {
-//     node->printAllSectors();
-// }
