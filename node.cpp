@@ -5,273 +5,292 @@
 
 #include "iostream"
 
-long long int Node::maxFieldSize;
+// static variables
+long long int Node::primalFieldSize;
 
-void Node::setParentFieldSize(xyz_t x1y1, xyz_t x2y2) {
-    this->x1y1 = x1y1;
-    this->x2y2 = x2y2;
-    maxFieldSize = x2y2.x;
+// class methods
+void Node::setField(Coord sizeFrom, Coord sizeTo) {
+    this->sizeFrom = sizeFrom;
+    this->sizeTo   = sizeTo;
+    primalFieldSize = sizeTo.x; // ps: can be used each "sizeTo" axis
 }
 
-void Node::setFieldSize(xyz_t x1y1, xyz_t x2y2) {
-    this->x1y1 = x1y1;
-    this->x2y2 = x2y2;
+void Node::setDaughterField(Coord sizeFrom, Coord sizeTo) {
+    this->sizeFrom = sizeFrom;
+    this->sizeTo   = sizeTo;
 }
 
-double Node::dist(xyz_t from, xyz_t to) {
-    xyz_t dist = to - from;
-    double result = (dist.x*dist.x) + (dist.y*dist.y) + (dist.z*dist.z);
-    return sqrt(result);
+double Node::distance(Coord from, Coord to) {
+    double dist = (to - from).diagonaleSq();
+    return sqrt(dist);
 }
 
-xyz_t Node::oldGravityInf(Particle* particle, Particle* target) {
+Coord Node::addToEveryAxes(Coord vec, float value) {
+    Coord result;
+    result.x = vec.x + value;
+    result.y = vec.y + value;
+    result.z = vec.z + value;
+    return result;
+}
+
+Coord Node::oldGravityCalc(Particle* particle, Particle* target) {
     float G = 6.6742E-11;
-    float r = dist(particle->getXYZ(), target->getXYZ());
+    float r = distance(particle->getPos(), target->getPos());
     double gravity = (G * particle->getMass() * target->getMass()) / (r * r);
 
-    xyz_t dist = target->getXYZ() - particle->getXYZ();
+    Coord dist = target->getPos() - particle->getPos();
     float k = gravity / (abs(dist.x) + abs(dist.y));
-    xyz_t gravity_vec = xyz_t(k * dist.x, k * dist.y, 0);
-    return gravity_vec;
+    Coord gravityVec = Coord(k * dist.x, k * dist.y, 0);
+    return gravityVec;
 }
 
-xyz_t Node::gravityInf(Particle* particle) {
-    xyz_t gravity_vec(0, 0, 0);
+Coord Node::gravityCalc(Particle* particle) {
+    Coord gravityVec(0, 0, 0);
     
-    float s = dist(x1y1, x2y2);
-    float r = dist(particle->getXYZ(), mass_centre.getXYZ());
-    if (r == 0)             // if particle try to attract itself,
-        return gravity_vec; // zero influence
+    float s = distance(sizeFrom, sizeTo);
+    float r = distance(particle->getPos(), mass_centre.getPos());
+    // if particle try to attract itself, return zero influence
+    if (r == 0)
+        return Coord(0, 0, 0);
 
-    // part of bern-hat algorithm
+    // part of Barnes-Hut algorithm
     bool last_level = true;
-    for (uint a = 0; a < daughter_count; a++)
-        if (node.get()) {
+    for (uint a = 0; a < daughterCount; a++) // todo: perspective remove place
+        if (daughters.get()) {
             last_level = false; 
             break;
         }
 
-    // influence calculation
-    if (r / s > COEF || last_level) {
+    // gravity influence calculation
+    if (r / s > SIMULATION_QUALITY_COEF || last_level) {
         float G = 6.6742E-13; // right vesion is 6.6742E-11
         // float G = 6.6742E-9;
-        double gravity = (G * particle->getMass() * mass_centre.getMass()) / r; // todo: r --> (r * r)
+        double gravity = (G * particle->getMass() * mass_centre.getMass()) / (r); // todo: r --> (r * r)
 
-        xyz_t vec = mass_centre.getXYZ() - particle->getXYZ();
+        Coord vec = mass_centre.getPos() - particle->getPos();
         float k = gravity / r;
-        gravity_vec = vec * k;
+        gravityVec = vec * k;
 
         // todo: reduild gravity power calculation
     }
     else {
-        for (uint a = 0; a < daughter_count; a++) {
-            if (node.get())
-                gravity_vec += node[a].gravityInf(particle);
+        for (uint a = 0; a < daughterCount; a++) {
+            if (daughters.get())
+                gravityVec += daughters[a].gravityCalc(particle);
         }
     }
 
-    return gravity_vec;
+    return gravityVec;
 }
 
-vector<pair<xyz_t, xyz_t>> Node::division(xyz_t x1y1, xyz_t x2y2) { // todo: remove parameters
-    vector<pair<xyz_t, xyz_t>> blocks; // array full (x1y1, x2y2) coords per line
+uint Node::whatKindRegion(Particle* particle) {
+    // It's a binary searching algorithm
+    // for finding place where stay the particle.
+    // Algorithm works checks every axes and where is the particle in current space 
+    // cuts everytime half available space.
+    // (right or left from axes centre).
+    // PS: 2d dimension has 4 regions, 3d dimension has 8 regions etc.
 
-    xyz_t center = (x2y2 + x1y1) / 2.0f;      // actually a centre
-    float quarter = (x2y2.x - x1y1.x) / 4.0f; // 1/4 of one coord length
-    xyz_t offset(quarter, 0, 0);              // how the centre must be moved for be changed to x1y1 and x2y2 
+    int result = daughterCount; // default: the hightest value
+
+    Coord node_size = sizeTo - sizeFrom;
+    Coord pos       = particle->getPos(); // current particle position
+    float center    = 0.0f;
+    int max_index   = dimension - 1;
+
+    // the higter index is used here
+    center = (node_size.getAxis(max_index) / 2.0f) + sizeFrom.getAxis(max_index);
+    result -= (pos.getAxis(max_index) < center) ? 2 : 1;
+
+    // other indexes
+    for (int index = max_index - 1; index >= 0; index--) {
+        center = (node_size.getAxis(index) / 2.0f) + sizeFrom.getAxis(index);
+        if (pos.getAxis(index) < center)
+            result -= 2 * (max_index - index);
+    }
+
+    return result;
+}
+
+vector<pair<Coord, Coord>> Node::getDaughterSpaces() {
+    vector<pair<Coord, Coord>> blocks; // vector full special (sizeFrom, sizeTo) pairs
+
+    Coord center = (sizeTo + sizeFrom) / 2.0f; // actually a centre
+    float quarter = (sizeTo.x - sizeFrom.x) / 4.0f;  // 1/4 of one axis
+    Coord offset(quarter, 0, 0); // how the centre must be moved for be changed to x1y1 and x2y2 
 
     // Start of lambda func.
     // It dublicate the centre ((x2y2 - x1y1) / 2) as a pair of two position with some changed coords, but only by one dimension.
-    // Repeat this action with the new position pack until it fill all space.
+    // Repeat this action with the new position points pack until it fill all space.
     // Example:
-    // for 2d world do it 2 times (result = 4 differ spaces)
-    // for 3d world do it 3 times (result = 8 differ spaces)
-    const int MAX_LAYER = dimension;
-    function<void(xyz_t, xyz_t, int)> mirror;
-    mirror = [&](xyz_t pos, xyz_t offset, int layer) {
-        if (layer == MAX_LAYER) { // centre into x1y1, x2y2
-            xyz_t coord1 = pos - quarter;
-            xyz_t coord2 = pos + quarter;
-            blocks.push_back(pair(coord1, coord2)); // save results
+    // for 2d dimension world do it 2 times (result = split space to 4 smaller spaces)
+    // for 3d dimension world do it 3 times (result = split space to 8 smaller spaces)
+    
+    const int AVAILABLE_MAX_LAYER = dimension;
+    // because fuction must be called the same times as dimension value. One time for each axis
+
+    function<void(Coord, Coord, int)> mirror; // todo: rename
+    mirror = [&](Coord pos, Coord offset, int layer) {
+        // if have found final block centre
+        if (layer == AVAILABLE_MAX_LAYER) {
+            Coord from = addToEveryAxes(pos, -quarter);
+            Coord to   = addToEveryAxes(pos,  quarter);
+            blocks.push_back(pair(from, to)); // save results
             return;
         }
 
-        xyz_t minus = pos - offset;
-        xyz_t plus = pos + offset;
-
-        offset.offset();
+        // find two points at the same distance from the axis centre
+        Coord left  = pos - offset;
+        Coord right = pos + offset;
+        
+        // do it again with other axes
+        offset.axesPermutation();
         layer++;
-        mirror(minus, offset, layer);
-        mirror(plus, offset, layer);
+        mirror(left,  offset, layer); // for left  point
+        mirror(right, offset, layer); // for right point
     };
     mirror(center, offset, FIRST_LAYER);
 
     return blocks;
 }
 
-uint Node::kindRegion(Particle* particle) {
-    xyz_t coord = particle->getXYZ();
-    xyz_t node_size(x2y2 - x1y1);
-
-    int kind = daughter_count;
-    int max_index = dimension - 1;
-    for (int index = max_index - 1; index >= 0; index--) {
-        float center = node_size.axis(index) / 2 + x1y1.axis(index);
-        if (coord.axis(index) < center)
-            kind -= 2 * (max_index - index);
-    }
-
-    float center = node_size.axis(max_index) / 2.0f + x1y1.axis(max_index);
-    kind = (coord.axis(max_index) < center) ? (kind - 2) : (kind - 1);
-
-    return kind;
+void Node::splitter(vector<Particle> particles) {
+    createDaughters(particles);
 }
 
-void Node::split(vector<Particle> particles) {
-    // switch (dimension) {
-    //     case DIMENSION_2D: split2d(particles); break;
-    //     case DIMENSION_3D: split3d(particles); break;
-    //     default: break;
-    // }
-    splitSpace(particles);
-}
-
-float Node::splitSpace(vector<Particle> particles) {
-    daughter_count = pow(2, (uint) dimension);
-    if (particles.size() == 0) { // space without particles
-        mass_centre = Particle(xyz_t(0, 0, 0), xyz_t(0, 0, 0), 0.0f);
-        return 0.0f;
+float Node::createDaughters(vector<Particle> particles) {
+    if (particles.size() == 0) { // space without any particles
+        mass_centre = Particle(Coord(0, 0, 0), Coord(0, 0, 0), 0.0f);
+        return 0.0f; // zero mass
     }
     if (particles.size() == 1) { // space with only one particle
         mass_centre = particles[0];
         return particles[0].getMass();
     }
 
-    // find where are particles
-    node = make_unique<Node[]>(daughter_count);
-    vector<Particle> regions[daughter_count];
-    xyz_t node_size(x2y2 - x1y1); //todo: x1y1 --> x1y1z1
-    for (uint a = 0; a < particles.size(); a++) {
-        // inside what kind quad is particle
-        uint kind = kindRegion(&particles[a]);
-        regions[kind].push_back(particles[a]);
-    }
-
     // create the nodes and get a mass sum
     float sum_mass = 0.0f;
     if (nestedness < MAX_NESTEDNESS) {
-        vector<pair<xyz_t, xyz_t>> canvas = division(x1y1, x2y2);
-        for (uint a = 0; a < daughter_count; a++) {
-            node[a] = Node(dimension, nestedness + 1); // create a daughter node
-            node[a].setFieldSize(canvas[a].first, canvas[a].second);
-            sum_mass += node[a].splitSpace(regions[a]); // recursion split the daughter node to the smaller nodes
-            
-            // <> (debug and just a nice visualization) <>
-            bool debugMode = false; //todo: remove
-            if (debugMode) {
-                switch (dimension) {
-                    case DIMENSION_2D: printNodeSectors2d(canvas[a].first, canvas[a].second); break;
-                    case DIMENSION_3D: printNodeSectors3d(canvas[a].first, canvas[a].second); break;
-                    default: break;
-                }
-            }
+        // find where are particles
+        this->daughters = make_unique<Node[]>(daughterCount);
+        vector<Particle> particlePacks[daughterCount];
+        for (uint a = 0; a < particles.size(); a++) {
+            // inside what kind quad is particle
+            uint k = whatKindRegion(&particles[a]);
+            particlePacks[k].push_back(particles[a]);
+        }
+
+        vector<pair<Coord, Coord>> spaces = getDaughterSpaces();
+        for (uint a = 0; a < daughterCount; a++) {
+            daughters[a] = Node(dimension, nestedness + 1); // create a daughter node
+            daughters[a].setDaughterField(spaces[a].first, spaces[a].second);
+            // come to next level
+            sum_mass += daughters[a].createDaughters(particlePacks[a]); // recursion split the daughter node to the smaller nodes
         }
     }
-    mass_centre = Particle((x2y2 - x1y1) / 2 + x1y1, xyz_t(0, 0, 0), sum_mass);
+    mass_centre = Particle((sizeTo - sizeFrom) / 2 + sizeFrom, Coord(0, 0, 0), sum_mass);
     return sum_mass;
 }
 
 
-// float Node::split3d(vector<Particle> particles) {
-//     daughter_count = 8;
-//     if (particles.size() == 0) { // space without particles
-//         mass_centre = Particle(xyz_t(0, 0, 0), xyz_t(0, 0, 0), 0.0f);
-//         return 0.0f;
-//     }
-//     if (particles.size() == 1) { // space with only one particle
-//         mass_centre = particles[0];
-//         return particles[0].getMass();
-//     }
 
-//     // find where are particles
-//     node = make_unique<Node[]>(daughter_count);
-//     vector<Particle> regions[daughter_count];
-//     xyz_t node_size(x2y2 - x1y1); //todo: x1y1 --> x1y1z1
-//     for (uint a = 0; a < particles.size(); a++) {
-//         // remember where particle stays
-//         uint kind = kindRegion(&particles[a]);
-//         regions[kind].push_back(particles[a]);
-//     }
+void Node::printNodeSectors2d() { // print quad around node space
+    Coord from = sizeFrom / primalFieldSize;
+    Coord to   = sizeTo   / primalFieldSize;
 
-//     // create the nodes and get a mass sum
-//     float sum_mass = 0.0f;
-//     if (nestedness < MAX_NESTEDNESS) {
-//         vector<pair<xyz_t, xyz_t>> canvas = division(x1y1, x2y2);
-//         for (uint a = 0; a < daughter_count; a++) {
-//             node[a] = Node(dimension, nestedness + 1); // create a daughter node
-//             node[a].setFieldSize(canvas[a].first, canvas[a].second);
-//             sum_mass += node[a].split3d(regions[a]); // recursion split the daughter node to the smaller nodes
-            
-//             // <> (debug and just a nice visualization) <>
-//             printNodeSectors3d(canvas[a].first, canvas[a].second);
-//         }
-//     }
-
-//     mass_centre = Particle((x2y2 - x1y1) / 2 + x1y1, xyz_t(0, 0, 0), sum_mass);
-//     return sum_mass;
-// }
-
-void Node::printNodeSectors2d(xyz_t x1y1, xyz_t x2y2) { // print quad around every dot
-    x1y1 = x1y1 / maxFieldSize;
-    x2y2 = x2y2 / maxFieldSize;
     const float brightness = 0.3f;
     glColor3f(brightness, brightness, brightness);
     glBegin(GL_LINE_STRIP);
-    glVertex2f(x1y1.x, x1y1.y);
-    glVertex2f(x1y1.x, x2y2.y);
-    glVertex2f(x2y2.x, x2y2.y);
-    glVertex2f(x2y2.x, x1y1.y);
-    glVertex2f(x1y1.x, x1y1.y);
+    glVertex2f(from.x, from.y);
+    glVertex2f(from.x, to.y  );
+    glVertex2f(to.x,   to.y  );
+    glVertex2f(to.x,   from.y);
+    glVertex2f(from.x, from.y);
     glEnd();
+
+    // if node has daughters, check them too
+    if (daughters != nullptr)
+        for (uint i = 0; i < daughterCount; i++)
+            daughters[i].printNodeSectors2d();
 }
 
-void Node::printNodeSectors3d(xyz_t x1y1, xyz_t x2y2) { // print cube around every dot
-    x1y1 = x1y1 / maxFieldSize;
-    x2y2 = x2y2 / maxFieldSize;
+// todo: rename parameters
+void Node::printNodeSectors3d() { // print cube around node space
+    Coord from = sizeFrom / primalFieldSize;
+    Coord to   = sizeTo   / primalFieldSize;
+
     const float brightness = 0.3f;
     glColor3f(brightness, brightness, brightness);
     glBegin(GL_LINE_STRIP);
     // iter 1
-    glVertex3f(x1y1.x, x1y1.y, x1y1.z);
-    glVertex3f(x1y1.x, x2y2.y, x1y1.z);
-    glVertex3f(x2y2.x, x2y2.y, x1y1.z);
-    glVertex3f(x2y2.x, x1y1.y, x1y1.z);
-    glVertex3f(x1y1.x, x1y1.y, x1y1.z);
+    glVertex3f(from.x, from.y, from.z);
+    glVertex3f(from.x, to.y,   from.z);
+    glVertex3f(to.x,   to.y,   from.z);
+    glVertex3f(to.x,   from.y, from.z);
+    glVertex3f(from.x, from.y, from.z);
     // iter 2
-    glVertex3f(x1y1.x, x1y1.y, x2y2.z);
-    glVertex3f(x1y1.x, x2y2.y, x2y2.z);
-    glVertex3f(x1y1.x, x2y2.y, x1y1.z);
+    glVertex3f(from.x, from.y, to.z  );
+    glVertex3f(from.x, to.y,   to.z  );
+    glVertex3f(from.x, to.y,   from.z);
     // iter 3
-    glVertex3f(x2y2.x, x2y2.y, x1y1.z);
-    glVertex3f(x2y2.x, x2y2.y, x2y2.z);
-    glVertex3f(x1y1.x, x2y2.y, x2y2.z);
-    // iter 3
-    glVertex3f(x1y1.x, x1y1.y, x2y2.z);
-    glVertex3f(x2y2.x, x1y1.y, x2y2.z);
-    glVertex3f(x2y2.x, x2y2.y, x2y2.z);
-    // iter 3
-    glVertex3f(x2y2.x, x2y2.y, x1y1.z);
-    glVertex3f(x2y2.x, x1y1.y, x1y1.z);
-    glVertex3f(x2y2.x, x1y1.y, x2y2.z);
+    glVertex3f(to.x,   to.y,   from.z);
+    glVertex3f(to.x,   to.y,   to.z  );
+    glVertex3f(from.x, to.y,   to.z  );
+    // iter 4
+    glVertex3f(from.x, from.y, to.z  );
+    glVertex3f(to.x,   from.y, to.z  );
+    glVertex3f(to.x,   to.y,   to.z  );
+    // iter 5
+    glVertex3f(to.x,   to.y,   from.z);
+    glVertex3f(to.x,   from.y, from.z);
+    glVertex3f(to.x,   from.y, to.z  );
     glEnd();
+    
+    // if node has daughters, check them too
+    if (daughters != nullptr)
+        for (uint i = 0; i < daughterCount; i++)
+            daughters[i].printNodeSectors3d();
 }
 
-void Node::printInfLine(xyz_t from, xyz_t to) { // inf = influence
-    from = from / maxFieldSize;
-    to = to / maxFieldSize;
+void Node::printAllSectors() {
+    switch (dimension) {
+        case DIMENSION_2D: printNodeSectors2d(); break;
+        case DIMENSION_3D: printNodeSectors3d(); break;
+        default: break;
+    }
+}
+
+void Node::printInfluenceLines(Coord from, Coord to) {
+    from = from / primalFieldSize;
+    to   = to   / primalFieldSize;
     glColor3f(1.0f, 0.0f, 0.0f);
     glBegin(GL_LINES);
     glVertex3f(from.x, from.y, from.z);
     glVertex3f(to.x, to.y, to.z);
     glEnd();
+}
+
+// ### CONSTRUCTORS ###
+
+// private:
+Node::Node(Dimension dimension, uint nestedness) {
+    this->dimension = dimension;
+    this->nestedness = nestedness;
+    this->daughterCount = pow(2, (uint) dimension);
+    this->daughters = nullptr;
+}
+
+// public:
+Node::Node(Dimension dimension) {
+    this->dimension = dimension;
+    this->nestedness = 0;
+    this->daughterCount = pow(2, (uint) dimension);
+    this->daughters = nullptr;
+}
+
+Node::Node(){
+    this->dimension = DIMENSION_2D;
+    this->nestedness = 0;
+    this->daughterCount = pow(2, (uint) dimension);
+    this->daughters = nullptr;
 }

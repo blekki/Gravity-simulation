@@ -1,9 +1,9 @@
-#include "xyz_t.h"
+#include "coord.h"
 #include "math.h"
 
-void xyz_t::normalize() {
-    xyz_t k(1, 1, 1);
-    xyz_t vec;
+void Coord::normalize() {
+    Coord k(1, 1, 1);
+    Coord vec;
     vec.x = k.x / abs(this->x);
     vec.y = k.y / abs(this->y);
     vec.z = k.z / abs(this->z);
@@ -13,14 +13,21 @@ void xyz_t::normalize() {
     this->z = this->z * vec.z;
 }
 
-void xyz_t::offset() {
+void Coord::axesPermutation() {
     float a = this->z;
     this->z = this->y;
     this->y = this->x;
     this->x = a;
 }
 
-float xyz_t::axis(uint index) {
+double Coord::diagonaleSq() {
+    double diagonale =  (this->x*this->x) +
+                        (this->y*this->y) + 
+                        (this->z*this->z);
+    return diagonale;
+}
+
+float Coord::getAxis(uint index) {
     switch (index) {
         case 0: return this->x; break;
         case 1: return this->y; break;
@@ -29,7 +36,7 @@ float xyz_t::axis(uint index) {
     }
 }
 
-void xyz_t::setAxis(uint index, float value) {
+void Coord::setAxis(uint index, float value) {
     switch (index) {
         case 0: this->x = value; break;
         case 1: this->y = value; break;
@@ -39,62 +46,62 @@ void xyz_t::setAxis(uint index, float value) {
 }
 
 // overload operators
-void xyz_t::operator+=(xyz_t other) {
+void Coord::operator+=(Coord other) {
     this->x += other.x;
     this->y += other.y;
     this->z += other.z;
 }
 
-xyz_t xyz_t::operator+(xyz_t other) {
-    xyz_t current;
+Coord Coord::operator+(Coord other) {
+    Coord current;
     current.x = this->x + other.x;
     current.y = this->y + other.y;
     current.z = this->z + other.z;
     return current;
 }
 
-xyz_t xyz_t::operator-(xyz_t other) {
-    xyz_t current;
+Coord Coord::operator-(Coord other) {
+    Coord current;
     current.x = this->x - other.x;
     current.y = this->y - other.y;
     current.z = this->z - other.z;
     return current;
 }
 
-xyz_t xyz_t::operator*(xyz_t other) {
-    xyz_t current;
+Coord Coord::operator*(Coord other) {
+    Coord current;
     current.x = this->x * other.x;
     current.y = this->y * other.y;
     current.z = this->z * other.z;
     return current;
 }
 
-xyz_t xyz_t::operator+(float num) {
-    xyz_t result;
-    result.x = this->x + num;
-    result.y = this->y + num;
-    result.z = this->z + num;
-    return result;
-}
+// Coord Coord::operator+(float num) {
+//     Coord result;
+//     result.x = this->x + num;
+//     result.y = this->y + num;
+//     result.z = this->z + num;
+//     return result;
+// }
 
-xyz_t xyz_t::operator-(float num) {
-    xyz_t result;
-    result.x = this->x - num;
-    result.y = this->y - num;
-    result.z = this->z - num;
-    return result;
-}
+// Coord Coord::operator-(float num) {
+//     Coord result;
+//     result.x = this->x - num;
+//     result.y = this->y - num;
+//     result.z = this->z - num;
+//     return result;
+// }
 
-xyz_t xyz_t::operator/(float num) {
-    xyz_t current;
+Coord Coord::operator/(float num) {
+    Coord current;
     current.x = this->x / num;
     current.y = this->y / num;
     current.z = this->z / num;
     return current;
 }
 
-xyz_t xyz_t::operator*(float num) {
-    xyz_t current;
+Coord Coord::operator*(float num) {
+    Coord current;
     current.x = this->x * num;
     current.y = this->y * num;
     current.z = this->z * num;

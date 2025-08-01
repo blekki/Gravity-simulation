@@ -1,61 +1,58 @@
 #pragma once
 
 #include "stdlib.h"
-#include <GL/gl.h>
+#include "math.h"
 #include "vector"
 #include "memory"
+#include <GL/gl.h>
 
 #include "enums.h"
 #include "particle.h"
-#include "xyz_t.h"
+#include "coord.h"
 
 using namespace std;
 
 class Node
 {   
     private:
-        // todo: sort variables
-        unique_ptr<Node[]> node; // daughter nodes (4 or 8)
-        uint daughter_count;
-        xyz_t x1y1, x2y2;
-        Particle mass_centre;
+        Dimension   dimension;
+        Coord       sizeFrom, sizeTo; // it's a space between x1y1..n1 and x2y2..n2 points
+        uint        nestedness; // current daughter node level
         
-        uint nestedness; // current daughter node level
-        Dimension dimension;
-
-        static long long int maxFieldSize; // max position from centre for particles
+        uint daughterCount;
+        unique_ptr<Node[]> daughters; // daughters = 4 (2d dimension) or 8 (3d dimension) and etc.
         
-        static const uint MAX_NESTEDNESS = 20;
-        static constexpr float COEF = 1.0f; // calculation accuracy (node size / dist > coef)
+        Particle    mass_centre;
 
-        vector<pair<xyz_t, xyz_t>> division(xyz_t x1y1, xyz_t x2y2);
-        uint kindRegion(Particle* particle);
-        // float split2d(vector<Particle> particles);
-        // float split3d(vector<Particle> particles);
-        float splitSpace(vector<Particle> particles);
+        static long long int primalFieldSize; // size of first parrent node
+        static constexpr float SIMULATION_QUALITY_COEF = 1.0f; // accuracy calculation
 
-        void printNodeSectors2d(xyz_t x1y1, xyz_t x2y2);
-        void printNodeSectors3d(xyz_t x1y1, xyz_t x2y2);
-        void printInfLine(xyz_t from, xyz_t to);
+    private:
+        double distance(Coord from, Coord to);
+        Coord addToEveryAxes(Coord vec, float value);
 
+        vector<pair<Coord, Coord>> getDaughterSpaces();
+        uint whatKindRegion(Particle* particle);
+        float createDaughters(vector<Particle> particles);
+        void setDaughterField(Coord sizeFrom, Coord sizeTo);
 
-        double dist(xyz_t from, xyz_t to);
+        // visual graphic for debug
+        void printNodeSectors2d(); // todo: need update
+        void printNodeSectors3d();
+        void printInfluenceLines(Coord from, Coord to);
+
+        Node(Dimension dimension, uint nestedness);
 
     public:
-        void setParentFieldSize(xyz_t x1y1, xyz_t x2y2);
-        void setFieldSize(xyz_t x1y1, xyz_t x2y2);
-        void split(vector<Particle> particles);
+        void setField(Coord sizeFrom, Coord sizeTo);
+        void splitter(vector<Particle> particles);
 
-        xyz_t oldGravityInf(Particle* from, Particle* to);
-        xyz_t gravityInf(Particle* particle);
+        Coord oldGravityCalc(Particle* from, Particle* to);
+        Coord gravityCalc(Particle* particle);
 
-        Node(Dimension dimension, uint nestedness)
-        : dimension(dimension), nestedness(nestedness)
-        {}
+        // visual graphic for debug
+        void printAllSectors();
         
-        Node(Dimension dimension)
-        : dimension(dimension), nestedness(0)
-        {}
-
-        Node(){}
+        Node(Dimension dimension);
+        Node();
 };

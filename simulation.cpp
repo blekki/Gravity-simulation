@@ -37,17 +37,19 @@ int main() {
     window.swapBuffers();
 
     // in time frames rendering
-    while (!window.windowShouldClose()) {
+    while (!window.shouldClose()) {
         window.preparationBeforeNextFrame();
 
         // all actions for changing the simulation stay
+        camera.rotate();
         if (!window.isSimulationOnPause()) {
-            camera.rotate();
+            // camera.rotate();
             cloud.updateParticles();
         }
         // todo: make possibility freeze simulation, but keep camera moves (so cool effect)
 
         // frame render
+        cloud.printNodeSectors();
         cloud.print();
         window.swapBuffers();
 
