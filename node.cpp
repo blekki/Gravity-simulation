@@ -224,26 +224,34 @@ void Node::printNodeSectors3d() { // print cube around node space
     glVertex3f(to.x,   from.y, from.z);
     glVertex3f(from.x, from.y, from.z);
     // iter 2
-    glVertex3f(from.x, from.y, to.z);
-    glVertex3f(from.x, to.y,   to.z);
+    glVertex3f(from.x, from.y, to.z  );
+    glVertex3f(from.x, to.y,   to.z  );
     glVertex3f(from.x, to.y,   from.z);
     // iter 3
     glVertex3f(to.x,   to.y,   from.z);
-    glVertex3f(to.x,   to.y,   to.z);
-    glVertex3f(from.x, to.y,   to.z);
+    glVertex3f(to.x,   to.y,   to.z  );
+    glVertex3f(from.x, to.y,   to.z  );
     // iter 4
-    glVertex3f(from.x, from.y, to.z);
-    glVertex3f(to.x,   from.y, to.z);
-    glVertex3f(to.x,   to.y,   to.z);
+    glVertex3f(from.x, from.y, to.z  );
+    glVertex3f(to.x,   from.y, to.z  );
+    glVertex3f(to.x,   to.y,   to.z  );
     // iter 5
-    glVertex3f(to.x, to.y,   from.z);
-    glVertex3f(to.x, from.y, from.z);
-    glVertex3f(to.x, from.y, to.z);
+    glVertex3f(to.x,   to.y,   from.z);
+    glVertex3f(to.x,   from.y, from.z);
+    glVertex3f(to.x,   from.y, to.z  );
     glEnd();
     
     if (daughters.get())
         for (uint i = 0; i < daughterCount; i++)
             daughters[i].printNodeSectors3d();
+}
+
+void Node::printAllSectors() {
+    switch (dimension) {
+        case DIMENSION_2D: printNodeSectors2d(); break;
+        case DIMENSION_3D: printNodeSectors3d(); break;
+        default: break;
+    }
 }
 
 void Node::printInfluenceLines(Coord from, Coord to) {

@@ -33,6 +33,8 @@ class Cloud
         // todo: create a method for a creating particles with a speed
         void updateParticles(); // todo: rename "updateFrame" or something as that
 
+        void printNodeSectors();
+
         Cloud(Dimension dimension) : dimension(dimension) { 
             node = make_unique<Node>(dimension);
         }

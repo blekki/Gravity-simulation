@@ -36,3 +36,7 @@ void Cloud::updateParticles() {
         particles[i].updatePos();
     }
 }
+
+void Cloud::printNodeSectors() {
+    node->printAllSectors();
+}

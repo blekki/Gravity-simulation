@@ -36,6 +36,11 @@ class Node
         float createDaughters(vector<Particle> particles);
         void setDaughterField(Coord sizeFrom, Coord sizeTo);
 
+        // visual graphic for debug
+        void printNodeSectors2d(); // todo: need update
+        void printNodeSectors3d();
+        void printInfluenceLines(Coord from, Coord to);
+
         Node(Dimension dimension, uint nestedness);
 
     public:
@@ -46,9 +51,7 @@ class Node
         Coord gravityCalc(Particle* particle);
 
         // visual graphic for debug
-        void printNodeSectors2d(); // todo: need update
-        void printNodeSectors3d();
-        void printInfluenceLines(Coord from, Coord to);
+        void printAllSectors();
         
         Node(Dimension dimension);
         Node();
