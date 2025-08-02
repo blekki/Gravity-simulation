@@ -3,12 +3,13 @@
 #include "memory"
 
 #include "enums.h"
+#include "ICloud.h"
 #include "particle.h"
 #include "node.h"
 
 using namespace std;
 
-class Cloud
+class Cloud: public ICloud
 {
     protected:
         vector<Particle> particles;
@@ -29,11 +30,11 @@ class Cloud
         void setDrawingProp();
 
     public:
-        void newParticles();
+        virtual void newParticles() override;
         // todo: create a method for a creating particles with a speed
-        void updateParticles(); // todo: rename "updateFrame" or something as that
+        virtual void updateParticles() override; // todo: rename "updateFrame" or something as that
 
-        void printNodeSectors();
+        virtual void printNodeSectors() override;
 
         Cloud(Dimension dimension) : dimension(dimension) { 
             node = make_unique<Node>(dimension);
