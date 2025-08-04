@@ -5,6 +5,7 @@
 class Cloud2d: public Cloud
 {
     public:
+        virtual void newParticles() override;
         virtual void print() override;
 
         Cloud2d() : Cloud(DIMENSION_2D) {

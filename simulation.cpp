@@ -36,7 +36,7 @@ int main() {
     ICloud* cloud = cloudFactory.createCloud(DIMENSION_2D); //todo: make it as CloudFactory
     cloud->newParticles();
     
-    // print particles before next (second) frame
+    // render preview frame
     cloud->print();
     window.swapBuffers();
 

@@ -28,9 +28,9 @@ class Cloud: public ICloud
     
     protected:
         void setDrawingProp();
+        void addNewParticle(Coord position, Coord speed);
 
     public:
-        virtual void newParticles() override;
         // todo: create a method for a creating particles with a speed
         virtual void updateParticles() override; // todo: rename "updateFrame" or something as that
 
