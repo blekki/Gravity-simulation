@@ -17,13 +17,17 @@ class Window
 
         // key callback
         static bool sim_pause;
+        static bool rotate_camera;
+        static bool sim_particles;
         static void key_callback(GLFWwindow *window, int key, int scancode, int action, int mods);
 
     public:
         int getWidth();
         int getHeight();
         bool shouldClose();
-        bool isSimulationOnPause(); //todo: maybe rename "doesSimulationPause"
+        bool isSimulationOnPause();
+        bool isCameraRotate();
+        bool isPartilesSimulate();
         
         void swapBuffers();
         void preparationBeforeNextFrame();

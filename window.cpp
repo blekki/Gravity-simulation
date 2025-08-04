@@ -2,25 +2,34 @@
 
 // static members
 bool Window::sim_pause = true;
+bool Window::rotate_camera = true;
+bool Window::sim_particles = true;
 
 void Window::key_callback(GLFWwindow *window, int key, int scancode, int action, int mods) { // call actions
-    if (key == GLFW_KEY_SPACE && action == 1)
-        sim_pause = (sim_pause) ? false : true;
-    
+    // exit program
     if (key == GLFW_KEY_ESCAPE && action == 1)
         glfwSetWindowShouldClose(window, true);
+        
+    // off/on all frame changing
+    if (key == GLFW_KEY_SPACE && action == 1) 
+        sim_pause = (sim_pause) ? false : true;
+    // off/on camera rotation
+    if (key == GLFW_KEY_C && action == 1)
+        rotate_camera = (rotate_camera) ? false : true;
+    // off/on particle simulation
+    if (key == GLFW_KEY_P && action == 1)
+        sim_particles = (sim_particles) ? false : true;
 }
 
 // other methods
 int Window::getWidth() { return width; }
 int Window::getHeight() { return height; }
+bool Window::isSimulationOnPause() { return sim_pause; }
+bool Window::isCameraRotate() { return rotate_camera; }
+bool Window::isPartilesSimulate() { return sim_particles; }
 
 bool Window::shouldClose() { 
     return glfwWindowShouldClose(window); 
-}
-
-bool Window::isSimulationOnPause() { 
-    return sim_pause; 
 }
 
 void Window::swapBuffers() {

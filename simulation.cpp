@@ -9,8 +9,8 @@
 #include "enums.h"
 #include "window.h"
 #include "camera.h"
-#include "cloudFactory.h"
 #include "ICloud.h"
+#include "cloudFactory.h"
 
 using namespace std;
 
@@ -27,7 +27,7 @@ int main() {
     // view window initialization
     Window window;
 
-    // preparation to simulation. First frame
+    // preparation to simulation. Load matrices
     Camera camera(window.getWidth(), window.getHeight());
     camera.updateMatrix();
     
@@ -39,18 +39,17 @@ int main() {
     // render preview frame
     cloud->print();
     window.swapBuffers();
-
     // in time frames rendering
     while (!window.shouldClose()) {
         window.preparationBeforeNextFrame();
 
         // all actions for changing the simulation stay
-        camera.rotate();
         if (!window.isSimulationOnPause()) {
-            // camera.rotate();
-            cloud->updateParticles();
+            if (window.isCameraRotate())
+                camera.rotate();
+            if (window.isPartilesSimulate())
+                cloud->updateParticles();
         }
-        // todo: make possibility freeze simulation, but keep camera moves (so cool effect)
 
         // frame render
         cloud->printNodeSectors();
