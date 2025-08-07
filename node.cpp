@@ -47,37 +47,42 @@ Coord Node::oldGravityCalc(Particle* particle, Particle* target) {
 Coord Node::gravityCalc(Particle* particle) {
     Coord gravityVec(0, 0, 0);
     
-    float s = distance(sizeFrom, sizeTo);
+    // float s = distance(sizeFrom, sizeTo);
+    float s = sizeTo.x - sizeFrom.x;
     float r = distance(particle->getPos(), mass_centre.getPos());
-    // if particle try to attract itself, return zero influence
+    // if particle tries to attract itself, return zero influence
     if (r == 0)
         return Coord(0, 0, 0);
 
-    // part of Barnes-Hut algorithm
-    bool last_level = true;
-    for (uint a = 0; a < daughterCount; a++) // todo: perspective remove place
-        if (daughters.get()) {
-            last_level = false; 
-            break;
-        }
-
     // gravity influence calculation
-    if (r / s > SIMULATION_QUALITY_COEF || last_level) {
-        float G = 6.6742E-13; // right vesion is 6.6742E-11
-        // float G = 6.6742E-9;
-        double gravity = (G * particle->getMass() * mass_centre.getMass()) / (r); // todo: r --> (r * r)
-
-        Coord vec = mass_centre.getPos() - particle->getPos();
-        float k = gravity / r;
-        gravityVec = vec * k;
-
+    bool last_layer = (daughters == nullptr) ? true : false;
+    if (r / s > SIMULATION_QUALITY_COEF || last_layer) {
+        // const float G = 6.6742E-13; // right vesion is 6.6742E-11
+        // const float G = 6.6742E-11;
+        // double gravity = (G * particle->getMass() * mass_centre.getMass()) / (r); // todo: r --> (r * r)
+        // Coord vec = mass_centre.getPos() - particle->getPos();
+        // vec.normalize();
+        // float k = gravity / r;
+        // gravityVec = vec * k;
+        
         // todo: reduild gravity power calculation
+
+        if (r <= 100 && !FIRST_LAYER)
+            return Coord(0, 0, 0);
+
+        const float G = 6.6742E-11;
+        const uint SECOND_COUNT = 86400 * 100; // seconds per timeline (86400 = second per day)
+        // calculations
+        double gravity = (G * particle->getMass() * mass_centre.getMass()) / (r * r);
+        Coord unit_vec = mass_centre.getPos() - particle->getPos();
+        unit_vec.normalize();
+        gravityVec = unit_vec * gravity * SECOND_COUNT;
+
     }
     else {
-        for (uint a = 0; a < daughterCount; a++) {
-            if (daughters.get())
+        if (daughters.get())
+            for (uint a = 0; a < daughterCount; a++)
                 gravityVec += daughters[a].gravityCalc(particle);
-        }
     }
 
     return gravityVec;

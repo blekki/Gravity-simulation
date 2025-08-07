@@ -19,8 +19,8 @@ class Cloud: public ICloud
         Dimension dimension;
 
         // range where particles can be created
-        const long long int SPACE_SIZE = 1E6; // km from centre
-        const int PARTICLE_COUNT = 1000; // 3000
+        const long long int SPACE_SIZE = 1E4; // km from centre
+        const int PARTICLE_COUNT = 2000; // 3000
         const int SPEED_RANGE = 1000;
         
         const int POINT_WIDTH = 1;

@@ -25,7 +25,7 @@ class Node
         Particle    mass_centre;
 
         static long long int primalFieldSize; // size of first parrent node
-        static constexpr float SIMULATION_QUALITY_COEF = 1.0f; // accuracy calculation
+        static constexpr float SIMULATION_QUALITY_COEF = 2.0f; // accuracy calculation
 
     private:
         double distance(Coord from, Coord to);
@@ -41,6 +41,7 @@ class Node
         void printNodeSectors3d();
         void printInfluenceLines(Coord from, Coord to);
 
+        // private constructor
         Node(Dimension dimension, uint nestedness);
 
     public:

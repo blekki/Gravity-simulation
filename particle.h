@@ -25,7 +25,7 @@ class Particle
         void updatePos();
 
         Particle(Coord pos, Coord speedVec)
-        : pos(pos), speedVec(speedVec), mass(1E9) //1E9 //1.5E14
+        : pos(pos), speedVec(speedVec), mass(10E3) // weight of small asteroid in tonns
         {}
         Particle(Coord pos, Coord speedVec, float mass) 
         : pos(pos), speedVec(speedVec), mass(mass)

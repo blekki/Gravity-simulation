@@ -2,15 +2,20 @@
 #include "math.h"
 
 void Coord::normalize() {
-    Coord k(1, 1, 1);
-    Coord vec;
-    vec.x = k.x / abs(this->x);
-    vec.y = k.y / abs(this->y);
-    vec.z = k.z / abs(this->z);
-
-    this->x = this->x * vec.x;
-    this->y = this->y * vec.y;
-    this->z = this->z * vec.z;
+    
+    double sqLen = diagonaleSq();
+    if (sqLen != 0.0f) {
+        float coef = 1.0f / sqrt(sqLen);
+        x = x * coef;
+        y = y * coef;
+        z = z * coef;
+    }
+    else {
+        x = 0.0f;
+        y = 0.0f;
+        z = 0.0f;
+    }
+         
 }
 
 void Coord::axesPermutation() {
@@ -75,22 +80,6 @@ Coord Coord::operator*(Coord other) {
     current.z = this->z * other.z;
     return current;
 }
-
-// Coord Coord::operator+(float num) {
-//     Coord result;
-//     result.x = this->x + num;
-//     result.y = this->y + num;
-//     result.z = this->z + num;
-//     return result;
-// }
-
-// Coord Coord::operator-(float num) {
-//     Coord result;
-//     result.x = this->x - num;
-//     result.y = this->y - num;
-//     result.z = this->z - num;
-//     return result;
-// }
 
 Coord Coord::operator/(float num) {
     Coord current;
