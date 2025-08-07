@@ -51,19 +51,20 @@ int main() {
     while (!window.shouldClose() && frames < FRAMES_COUNT) {
         window.preparationBeforeNextFrame();
 
-        oldTime = clock();
         // all actions for changing the simulation stay
         if (!window.isSimulationOnPause()) {
+            oldTime = clock();
+
             if (window.isCameraRotate())
                 camera.rotate();
             if (window.isPartilesSimulate())
                 cloud->updateParticles();
+            
+            newTime = clock();
+            double delta = double(newTime - oldTime) / double(CLOCKS_PER_SEC);
+            allTime += delta;
+            frames++;
         }
-        newTime = clock();
-        double delta = double(newTime - oldTime) / double(CLOCKS_PER_SEC);
-        // cout << "Time: " << delta << " sec" << endl;
-        allTime += delta;
-        frames++;
 
         // frame render
         // cloud->printNodeSectors();

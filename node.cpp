@@ -57,23 +57,14 @@ Coord Node::gravityCalc(Particle* particle) {
     // gravity influence calculation
     bool last_layer = (daughters == nullptr) ? true : false;
     if (r / s > SIMULATION_QUALITY_COEF || last_layer) {
-        // const float G = 6.6742E-13; // right vesion is 6.6742E-11
-        // const float G = 6.6742E-11;
-        // double gravity = (G * particle->getMass() * mass_centre.getMass()) / (r); // todo: r --> (r * r)
-        // Coord vec = mass_centre.getPos() - particle->getPos();
-        // vec.normalize();
-        // float k = gravity / r;
-        // gravityVec = vec * k;
-        
-        // todo: reduild gravity power calculation
-
-        if (r <= 100 && !FIRST_LAYER)
+        // two particles to close for calculation
+        if (r <= 100) // todo: make a constant for current value
             return Coord(0, 0, 0);
 
         const float G = 6.6742E-11;
         const uint SECOND_COUNT = 86400 * 100; // seconds per timeline (86400 = second per day)
         // calculations
-        double gravity = (G * particle->getMass() * mass_centre.getMass()) / (r * r);
+        float gravity = (G * particle->getMass() * mass_centre.getMass()) / (r * r);
         Coord unit_vec = mass_centre.getPos() - particle->getPos();
         unit_vec.normalize();
         gravityVec = unit_vec * gravity * SECOND_COUNT;
@@ -165,11 +156,14 @@ void Node::splitter(vector<Particle> particles) {
 
 float Node::createDaughters(vector<Particle> particles) {
     if (particles.size() == 0) { // space without any particles
-        mass_centre = Particle(Coord(0, 0, 0), Coord(0, 0, 0), 0.0f);
+        Coord pos(0, 0, 0);
+        Coord speed(0, 0, 0);
+        float mass = 0.0f;
+        this->mass_centre = Particle(pos, speed, mass); // zero mass
         return 0.0f; // zero mass
     }
     if (particles.size() == 1) { // space with only one particle
-        mass_centre = particles[0];
+        this->mass_centre = particles[0];
         return particles[0].getMass();
     }
 
@@ -193,7 +187,9 @@ float Node::createDaughters(vector<Particle> particles) {
             sum_mass += daughters[a].createDaughters(particlePacks[a]); // recursion split the daughter node to the smaller nodes
         }
     }
-    mass_centre = Particle((sizeTo - sizeFrom) / 2 + sizeFrom, Coord(0, 0, 0), sum_mass);
+    Coord pos = (sizeTo - sizeFrom) / 2 + sizeFrom;
+    Coord zeroSpeed(0, 0, 0);
+    this->mass_centre = Particle(pos, zeroSpeed, sum_mass);
     return sum_mass;
 }
 
