@@ -1,8 +1,8 @@
 #include "window.h"
 
 // static members
-bool Window::sim_pause = true;
-bool Window::rotate_camera = true;
+bool Window::sim_pause = false;
+bool Window::rotate_camera = false;
 bool Window::sim_particles = true;
 
 void Window::key_callback(GLFWwindow *window, int key, int scancode, int action, int mods) { // call actions
