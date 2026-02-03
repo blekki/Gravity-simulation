@@ -48,6 +48,7 @@ int main() {
     // in time frames rendering
     while (!window.shouldClose() && !timer.isFrameOutOfRange()) {
         timer.start();
+        window.capFrameRate(); // fps lock
         window.preparationBeforeNextFrame();
 
         // all actions for changing the simulation stay

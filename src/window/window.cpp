@@ -46,6 +46,15 @@ void Window::pollEvents() {
     glfwPollEvents();
 }
 
+void Window::capFrameRate() {
+    double currentTime = glfwGetTime();
+    while ((currentTime - prevFrameTime) < (1.0 / FPS_LOCK)) {
+        currentTime = glfwGetTime();
+        pollEvents();
+    }
+    prevFrameTime = currentTime;
+}
+
 Window::Window() {
     // window initialization
     window = glfwCreateWindow(width, height, "Space simulation", NULL, NULL);

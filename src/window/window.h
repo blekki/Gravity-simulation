@@ -11,7 +11,7 @@ class Window
     private:
         GLFWwindow* window;
 
-        // size in pixels
+        // canvas size in pixel
         int width = 1024;
         int height = 720;
 
@@ -20,6 +20,10 @@ class Window
         static bool rotate_camera;
         static bool sim_particles;
         static void key_callback(GLFWwindow *window, int key, int scancode, int action, int mods);
+
+        // fps lock feature
+        double prevFrameTime = 0.0f;
+        const double FPS_LOCK = 120.0;
 
     public:
         int getWidth();
@@ -32,6 +36,7 @@ class Window
         void swapBuffers();
         void preparationBeforeNextFrame();
         void pollEvents();
+        void capFrameRate();    // wait until the frame time comes
 
         Window();
         ~Window();
