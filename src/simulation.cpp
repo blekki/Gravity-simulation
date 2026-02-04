@@ -10,8 +10,6 @@
 #include "window.h"
 #include "camera.h"
 #include "cloud.h"
-// #include "ICloud.h"
-// #include "cloudFactory.h"
 #include "timer.h"
 
 using namespace std;
@@ -34,7 +32,7 @@ int main() {
     camera.updateMatrix();
     
     // create cloud with particles
-    Cloud cloud(DIMENSION_3D);
+    Cloud cloud(DIMENSION_2D);
 
     // actually a timer
     Timer timer;
