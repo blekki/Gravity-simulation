@@ -3,6 +3,9 @@
 
 #include "iostream"
 
+const float Particle::DEFAULT_MASS = 10E3;
+const int Particle::GENERATION_ACCURACY = 10000; // ps: highter number = less discretization of generate values
+
 void Particle::setPos(Coord pos) { this->pos = pos; }
 void Particle::setSpeed(Coord speedVec) { this->speedVec = speedVec; }
 void Particle::addSpeed(Coord speedVec) { this->speedVec += speedVec; }

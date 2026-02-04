@@ -8,9 +8,9 @@ set(SOURCES
     src/struct/coord.cpp
     # physics logic
     src/cloud/cloud.cpp
-    src/cloud/cloud2d.cpp
-    src/cloud/cloud3d.cpp
-    src/cloud/cloudFactory.cpp
+    # src/cloud/cloud2d.cpp
+    # src/cloud/cloud3d.cpp
+    # src/cloud/cloudFactory.cpp
     src/cloud/physics/particle.cpp
     src/cloud/physics/node.cpp
     # other
