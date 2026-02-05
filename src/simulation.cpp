@@ -9,8 +9,7 @@
 #include "enums.h"
 #include "window.h"
 #include "camera.h"
-#include "ICloud.h"
-#include "cloudFactory.h"
+#include "cloud.h"
 #include "timer.h"
 
 using namespace std;
@@ -21,7 +20,7 @@ int main() {
 
     // glfw initialization
     if (!glfwInit()) {
-        cout << "Initialization failed" << endl;
+        cerr << "Initialization failed" << endl;
         exit(EXIT_FAILURE);
     }
 
@@ -33,16 +32,14 @@ int main() {
     camera.updateMatrix();
     
     // create cloud with particles
-    CloudFactory cloudFactory;
-    ICloud* cloud = cloudFactory.createCloud(DIMENSION_2D); //todo: make it as CloudFactory
-    cloud->newParticles();
+    Cloud cloud(DIMENSION_2D);
 
     // actually a timer
     Timer timer;
     timer.setMaxFrameCount(200);
     
     // render preview frame
-    cloud->print();
+    cloud.print();
     window.swapBuffers();
 
     // in time frames rendering
@@ -57,12 +54,12 @@ int main() {
             if (window.isCameraRotate())
                 camera.rotate();
             if (window.isPartilesSimulate())
-                cloud->updateParticles();
+                cloud.updateParticles();
         }
 
         // frame render
-        // cloud->printNodeSectors();
-        cloud->print();
+        // cloud.printNodeSectors();
+        cloud.print();
         window.swapBuffers();
 
         // other needy manipulation
@@ -71,7 +68,5 @@ int main() {
     }
     timer.printResults();
 
-    // delete unneeded
-    cloud = nullptr;
-    delete cloud;
+    clog << "[log] An application was successfully closed" << endl;
 }

@@ -12,7 +12,6 @@ struct Coord
     double diagonaleSq(); // prefix "Sq" because it doesn't use sqrt() inside
     float getAxis(uint index); //todo: axis --> getAxis
     void setAxis(uint index, float value);
-    
 
     Coord addToEveryAxes(float value); // todo: need update
     // bool operator==(const Coord other);

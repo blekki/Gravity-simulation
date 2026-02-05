@@ -10,8 +10,19 @@ class Particle
         Coord speedVec;
         float mass;
 
+        static const float DEFAULT_MASS;
+        static const int GENERATION_ACCURACY;
+
+    private:
+        void resetPos();
+        void resetSpeed();
+        void setDefaultMass();
+
     public:
         void setPos(Coord pos);
+        void setRandomPosXY(float range);
+        void setRandomPosXYZ(float range);
+        void updatePos();
         void setSpeed(Coord speedVec);
         void addSpeed(Coord speedVec);
 
@@ -22,13 +33,7 @@ class Particle
         Coord getSpeed();
         float getMass();
 
-        void updatePos();
-
-        Particle(Coord pos, Coord speedVec)
-        : pos(pos), speedVec(speedVec), mass(10E3) // weight of small asteroid in tonns
-        {}
-        Particle(Coord pos, Coord speedVec, float mass) 
-        : pos(pos), speedVec(speedVec), mass(mass)
-        {}
-        Particle(){}
+        Particle();
+        Particle(Coord pos, Coord speedVec);
+        Particle(Coord pos, Coord speedVec, float mass);
 };
