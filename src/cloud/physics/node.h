@@ -26,6 +26,10 @@ class Node
 
         static long long int primalFieldSize; // size of first parrent node
         static constexpr float SIMULATION_QUALITY_COEF = 2.0f; // accuracy calculation
+        
+        // static const float G = 6.6742E-11;
+        static constexpr float LOWER_CALC_BORDER = 100;
+        static const Coord NO_INFLUENCE;
 
     private:
         double distance(Coord from, Coord to);
@@ -46,7 +50,7 @@ class Node
 
     public:
         void setField(Coord sizeFrom, Coord sizeTo);
-        void splitter(vector<Particle> particles);
+        void splitter(vector<Particle> particles);      // todo: rename to "split" or the same way
 
         Coord oldGravityCalc(Particle* from, Particle* to);
         Coord gravityCalc(Particle* particle);

@@ -47,7 +47,7 @@ void Window::pollEvents() {
 }
 
 void Window::capFrameRate() {
-    double currentTime = glfwGetTime();
+    volatile double currentTime = glfwGetTime();
     while ((currentTime - prevFrameTime) < (1.0 / FPS_LOCK)) {
         currentTime = glfwGetTime();
         pollEvents();

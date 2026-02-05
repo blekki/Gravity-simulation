@@ -1,3 +1,7 @@
+# This makefile is useful feature.
+# It gives you possibility to control project building
+# inside the source dir not the "build".
+
 BUILD_DIR := build
 PROJECT_NAME := simulation
 
@@ -26,6 +30,10 @@ compile:
 .PHONY: run
 run: $(BUILD_DIR)/$(PROJECT_NAME)
 	$(BUILD_DIR)/$(PROJECT_NAME)
+
+.PHONY: test
+test:
+	@cd $(BUILD_DIR) ; $(MAKE) --no-print-directory test
 
 # cleaning
 .PHONY: rm-build

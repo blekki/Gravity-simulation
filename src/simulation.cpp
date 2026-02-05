@@ -46,7 +46,8 @@ int main() {
     window.swapBuffers();
 
     // in time frames rendering
-    while (!window.shouldClose() && !timer.isFrameOutOfRange()) {
+    // while (!window.shouldClose() && !timer.isFrameOutOfRange()) {
+    while (!window.shouldClose()) {
         timer.start();
         window.capFrameRate(); // fps lock
         window.preparationBeforeNextFrame();

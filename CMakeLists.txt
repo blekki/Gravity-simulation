@@ -1,26 +1,28 @@
 cmake_minimum_required(VERSION 3.15)
+project(simulation)
+set(CMAKE_CXX_FLAGS "-O0 -g2")
+set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_SOURCE_DIR}/${BUILD_DIR})
 
+# various variables
 set(BUILD_DIR build)
+set(LIBS GLEW glfw GL GLU)
 set(SOURCES
-    # start point (main)
+    # start point (main):
     src/simulation.cpp
-    # structures
+    # structures:
     src/struct/coord.cpp
-    # physics logic
+    # physics logic:
     src/cloud/cloud.cpp
-    src/cloud/cloud2d.cpp
-    src/cloud/cloud3d.cpp
-    src/cloud/cloudFactory.cpp
     src/cloud/physics/particle.cpp
     src/cloud/physics/node.cpp
-    # other
+    # other:
     src/window/window.cpp
     src/timer/timer.cpp
 )
 
-# add fast way include headers
-add_library(headers INTERFACE)
-target_include_directories(headers INTERFACE
+# create static lib
+add_library(SUBDIRS_INTERFACE INTERFACE)
+target_include_directories(SUBDIRS_INTERFACE INTERFACE
     ${CMAKE_CURRENT_SOURCE_DIR}/src
     ${CMAKE_CURRENT_SOURCE_DIR}/src/cloud
     ${CMAKE_CURRENT_SOURCE_DIR}/src/cloud/physics
@@ -29,10 +31,13 @@ target_include_directories(headers INTERFACE
     ${CMAKE_CURRENT_SOURCE_DIR}/src/camera
     ${CMAKE_CURRENT_SOURCE_DIR}/src/timer
 )
+add_library(static_lib STATIC ${SOURCES})   # uses for fast way compile unit_tests
+target_link_libraries(static_lib PUBLIC SUBDIRS_INTERFACE)
 
-# compilation rules
-project(simulation)
-set(CMAKE_CXX_FLAGS "-O0 -g2")
-set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_SOURCE_DIR}/${BUILD_DIR})
+# project compilation
 add_executable(${PROJECT_NAME} ${SOURCES})
-target_link_libraries(${PROJECT_NAME} PUBLIC headers GLEW glfw GL GLU)
+target_link_libraries(${PROJECT_NAME} PUBLIC static_lib ${LIBS})
+
+# other
+enable_testing()
+add_subdirectory(tests)

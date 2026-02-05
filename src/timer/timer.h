@@ -9,9 +9,13 @@ class Timer
 {
     private:
         clock_t timeBegin, timeEnd;
-        float allTime;
+        float allTime;          // todo: remove
         uint frame;
         uint maxFrame;
+
+        // todo: use this variables
+        // uint currentFrame;
+        // uint maxFrameRuntime;   // for debug mode
 
     public:
         void setMaxFrameCount(uint maxFrame);

@@ -7,6 +7,7 @@
 
 // static variables
 long long int Node::primalFieldSize;
+const Coord Node::NO_INFLUENCE = Coord(0, 0, 0);
 
 // class methods
 void Node::setField(Coord sizeFrom, Coord sizeTo) {
@@ -48,21 +49,21 @@ Coord Node::gravityCalc(Particle* particle) {
     Coord gravityVec(0, 0, 0);
     
     // float s = distance(sizeFrom, sizeTo);
-    float s = sizeTo.x - sizeFrom.x;
+    float s = sizeTo.x - sizeFrom.x;            // node-size by only one axis (make calculation simpler)
     float r = distance(particle->getPos(), mass_centre.getPos());
     // if particle tries to attract itself, return zero influence
     if (r == 0)
-        return Coord(0, 0, 0);
+        return NO_INFLUENCE;
 
     // gravity influence calculation
     bool last_layer = (daughters == nullptr) ? true : false;
     if (r / s > SIMULATION_QUALITY_COEF || last_layer) {
         // two particles to close for calculation
-        if (r <= 100) // todo: make a constant for current value
-            return Coord(0, 0, 0);
+        if (r <= LOWER_CALC_BORDER) // todo: make a constant for current value
+            return NO_INFLUENCE;
 
-        const float G = 6.6742E-11;
-        const uint SECOND_COUNT = 86400 * 100; // seconds per timeline (86400 = second per day)
+        const float G = 6.6742E-11;            // todo: use class constant (no local)
+        const uint SECOND_COUNT = 60 * 60 * 24 * 100; // seconds per 100 days
         // calculations
         float gravity = (G * particle->getMass() * mass_centre.getMass()) / (r * r);
         Coord unit_vec = mass_centre.getPos() - particle->getPos();
