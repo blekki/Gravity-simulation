@@ -19,7 +19,7 @@ void Timer::stop() {
 }
 
 bool Timer::isFrameOutOfRange() {
-    return (frame < maxFrame) ? false : true;
+    return (frame > maxFrame) ? true : false;
 }
 
 void Timer::reset() {
@@ -32,8 +32,8 @@ void Timer::printResults() {
     float avarageTime = allTime / float(frame);
     float fps = 1.0f / avarageTime;
     cout << "frame count: " << frame << endl;
-    cout << "all time: " << allTime << endl;
-    cout << "avarage time per frame: " << avarageTime << endl;
+    cout << "run (sec): " << allTime << endl;
+    cout << "avarage frame time consuming: " << avarageTime << endl;
     cout << "fps: " << fps << endl;
 }
 
