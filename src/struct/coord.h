@@ -8,12 +8,13 @@ struct Coord
     float z;
 
     void normalize();
-    void axesPermutation(); // todo: rename from offset
-    double diagonaleSq(); // prefix "Sq" because it doesn't use sqrt() inside
-    float getAxis(uint index); //todo: axis --> getAxis
+    void axesPermutation();
+    double diagonale();
+    double diagonaleSq();       // gives you square diagonale
+    float getAxis(uint index);
     void setAxis(uint index, float value);
+    void addToEveryAxes(float value);
 
-    Coord addToEveryAxes(float value); // todo: need update
     friend bool operator==(const Coord& lhs, const Coord& rhs);
     friend bool operator!=(const Coord& lhs, const Coord& rhs);
     void operator+=(Coord other);
@@ -22,10 +23,6 @@ struct Coord
     Coord operator*(Coord other);
     Coord operator/(float num);
     Coord operator*(float num);
-
-    // todo: some change
-    // Coord operator+(float num); // very specific action
-    // Coord operator-(float num); // very specific action
 
     Coord(float x, float y, float z)
     : x(x), y(y), z(z)

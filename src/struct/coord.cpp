@@ -25,6 +25,10 @@ void Coord::axesPermutation() {
     this->x = a;
 }
 
+double Coord::diagonale() {
+    return sqrt(diagonaleSq());
+}
+
 double Coord::diagonaleSq() {
     double diagonale =  (this->x*this->x) +
                         (this->y*this->y) + 
@@ -48,6 +52,12 @@ void Coord::setAxis(uint index, float value) {
         case 2: this->z = value; break;
         default: break;
     }
+}
+
+void Coord::addToEveryAxes(float value) {
+    this->x += value;
+    this->y += value;
+    this->z += value;
 }
 
 // overload operators
