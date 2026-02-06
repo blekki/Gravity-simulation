@@ -12,9 +12,9 @@ set(SOURCES
     # structures:
     src/struct/coord.cpp
     # physics logic:
-    src/cloud/cloud.cpp
-    src/cloud/physics/particle.cpp
-    src/cloud/physics/node.cpp
+    src/physics/cloud.cpp
+    src/physics/particle.cpp
+    src/physics/node.cpp
     # other:
     src/window/window.cpp
     src/timer/timer.cpp
@@ -24,9 +24,8 @@ set(SOURCES
 add_library(SUBDIRS_INTERFACE INTERFACE)
 target_include_directories(SUBDIRS_INTERFACE INTERFACE
     ${CMAKE_CURRENT_SOURCE_DIR}/src
-    ${CMAKE_CURRENT_SOURCE_DIR}/src/cloud
-    ${CMAKE_CURRENT_SOURCE_DIR}/src/cloud/physics
     ${CMAKE_CURRENT_SOURCE_DIR}/src/struct
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/physics
     ${CMAKE_CURRENT_SOURCE_DIR}/src/window
     ${CMAKE_CURRENT_SOURCE_DIR}/src/camera
     ${CMAKE_CURRENT_SOURCE_DIR}/src/timer
