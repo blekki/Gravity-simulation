@@ -51,13 +51,16 @@ void Coord::setAxis(uint index, float value) {
 }
 
 // overload operators
-// bool Coord::operator==(const Coord other) {
 bool operator==(const Coord& lhs, const Coord& rhs) {
     if (lhs.x != rhs.x) return false;
     if (lhs.y != rhs.y) return false;
     if (lhs.z != rhs.z) return false;
     // else
     return true;
+}
+
+bool operator!=(const Coord& lhs, const Coord& rhs) {
+    return (lhs == rhs) ? false : true;
 }
 
 void Coord::operator+=(Coord other) {

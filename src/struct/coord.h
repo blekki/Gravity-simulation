@@ -14,8 +14,8 @@ struct Coord
     void setAxis(uint index, float value);
 
     Coord addToEveryAxes(float value); // todo: need update
-    // bool operator==(const Coord other);
     friend bool operator==(const Coord& lhs, const Coord& rhs);
+    friend bool operator!=(const Coord& lhs, const Coord& rhs);
     void operator+=(Coord other);
     Coord operator+(Coord other);
     Coord operator-(Coord other);
