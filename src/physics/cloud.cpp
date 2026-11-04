@@ -43,7 +43,7 @@ Coord Cloud::asNDC(Coord coord) {
 }
 
 // public methods
-void Cloud::updateParticles() {
+void Cloud::updateParticles(float deltaTime) {
     node = make_unique<Node>(dimension);
     node->setField(nodeSizeFromCenter * -1.0f, nodeSizeFromCenter);
     node->splitter(particles);

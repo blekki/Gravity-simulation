@@ -34,7 +34,7 @@ class Cloud
 
     public:
         // todo: create a method for a creating particles with a speed
-        void updateParticles();
+        void updateParticles(float deltaTime);
         void print();
         void printNodeSectors();
 

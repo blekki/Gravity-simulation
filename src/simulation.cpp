@@ -8,28 +8,26 @@
 
 #include "enums.h"
 #include "window.h"
-#include "camera.h"
 #include "cloud.h"
 #include "timer.h"
 
-using namespace std;
 
 int main() {
-    // make each simulation randomly
-    // srand(time(0)); // todo: uncomment
+    // srand(time(0));  // make each simulation randomly    // todo: uncomment
 
-    // glfw initialization
-    if (!glfwInit()) {
-        cerr << "Initialization failed" << endl;
+    Window window(1024, 720);
+    try {
+        if (!glfwInit())
+            throw std::runtime_error("Initialization failed");
+        window.init();
+    } catch (std::exception &e) {
+        std::cerr << e.what() << std::endl;
         exit(EXIT_FAILURE);
     }
 
-    // view window initialization
-    Window window;
-
     // preparation to simulation. Load matrices
-    Camera camera(window.getWidth(), window.getHeight());
-    camera.updateMatrix();
+    // Camera camera(window.getWidth(), window.getHeight());
+    // camera.updateMatrix();
     
     // create cloud with particles
     Cloud cloud(DIMENSION_2D);
@@ -47,14 +45,15 @@ int main() {
     while (!window.shouldClose()) {
         timer.start();
         window.capFrameRate(); // fps lock
-        window.preparationBeforeNextFrame();
+        window.prepareToNextFrame();
 
-        // all actions for changing the simulation stay
-        if (!window.isSimulationOnPause()) {
-            if (window.isCameraRotate())
-                camera.rotate();
-            if (window.isPartilesSimulate())
-                cloud.updateParticles();
+        // changing the simulation stay
+        if (!SimParams::pause_all) {
+            if (!SimParams::pause_gravity) {
+                // todo: calc delta time
+                float delta_time = 0.01f;
+                cloud.updateParticles(delta_time);
+            }
         }
 
         // frame render
@@ -68,5 +67,5 @@ int main() {
     }
     timer.printResults();
 
-    clog << "[log] An application was successfully closed" << endl;
+    std::clog << "[log] An application was successfully closed" << std::endl;
 }
