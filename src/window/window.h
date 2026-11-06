@@ -16,9 +16,9 @@ class Window
         GLFWwindow* window;
         Camera camera;
 
-        // canvas size in pixel
-        int width = 1024;
-        int height = 720;
+        int width = 1024;   // canvas size in pixel
+        int height = 720;   //
+        const char* title = "Default title";
 
         // key callback
         static void key_callback(GLFWwindow *window, int key, int scancode, int action, int mods);
@@ -37,9 +37,7 @@ class Window
         void pollEvents();
         void capFrameRate();    // wait until the frame time comes
 
-        void init();
+        void init(int width, int height, const char* title);
 
-        Window();
-        Window(int width, int height);
         ~Window();
 };

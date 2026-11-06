@@ -15,11 +15,9 @@
 int main() {
     // srand(time(0));  // make each simulation randomly    // todo: uncomment
 
-    Window window(1024, 720);
+    Window window;
     try {
-        if (!glfwInit())
-            throw std::runtime_error("Initialization failed");
-        window.init();
+        window.init(1024, 720, "Gravity simulation");
     } catch (std::exception &e) {
         std::cerr << e.what() << std::endl;
         exit(EXIT_FAILURE);

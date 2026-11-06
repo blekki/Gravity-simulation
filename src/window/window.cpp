@@ -62,23 +62,23 @@ void Window::capFrameRate() {
     prevFrameTime = currentTime;
 }
 
-void Window::init() {
-    window = glfwCreateWindow(width, height, "Space simulation", NULL, NULL);
-    if (!window) {
+void Window::init(int width, int height, const char* title) {
+    this->width = width;
+    this->height = height;
+    this->title = title;
+
+    if (!glfwInit())
+        throw std::runtime_error("GLFW initialization failed");
+    
+    window = glfwCreateWindow(width, height, title, NULL, NULL);
+    if (!window)
         throw std::runtime_error("Window context creation failed");
-    }
 
     glfwMakeContextCurrent(window);
     glfwSetKeyCallback(window, key_callback);
     glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
     glEnable(GL_DEPTH_TEST);
     glEnable(GL_BLEND);
-}
-
-Window::Window() {};
-
-Window::Window(int width, int height) : width(width), height(height) {
-    Window();
 }
 
 Window::~Window() {
