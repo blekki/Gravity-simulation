@@ -18,7 +18,8 @@ class Window
 
         int width = 1024;   // canvas size in pixel
         int height = 720;   //
-        const char* title = "Default title";
+        const char* title = "Window";
+        bool isInitialized = false;
 
         // key callback
         static void key_callback(GLFWwindow *window, int key, int scancode, int action, int mods);

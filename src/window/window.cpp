@@ -63,6 +63,9 @@ void Window::capFrameRate() {
 }
 
 void Window::init(int width, int height, const char* title) {
+    if (isInitialized)
+        return; // already initialized before
+    
     this->width = width;
     this->height = height;
     this->title = title;
@@ -79,6 +82,8 @@ void Window::init(int width, int height, const char* title) {
     glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
     glEnable(GL_DEPTH_TEST);
     glEnable(GL_BLEND);
+    isInitialized = true;
+    std::clog << "Window initialized\n";
 }
 
 Window::~Window() {
