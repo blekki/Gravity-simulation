@@ -30,7 +30,7 @@ target_link_libraries(static_lib PUBLIC SUBDIRS_INTERFACE)
 
 # project compilation
 project(simulation)
-set(CMAKE_CXX_FLAGS "-O0 -g2")
+set(CMAKE_CXX_FLAGS "-O0 -g2 -Wall -Wextra -Werror")
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_SOURCE_DIR}/${BUILD_DIR})
 add_executable(${PROJECT_NAME} ${SOURCES})
 target_link_libraries(${PROJECT_NAME} PUBLIC static_lib ${LIBS})
