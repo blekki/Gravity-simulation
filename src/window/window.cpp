@@ -26,40 +26,8 @@ void Window::key_callback(GLFWwindow *window, int key, int scancode, int action,
 }
 
 // other methods
-int Window::getWidth() { return width; }
-int Window::getHeight() { return height; }
-
-bool Window::shouldClose() { 
-    return glfwWindowShouldClose(window); 
-}
-
-void Window::swapBuffers() {
-    glfwSwapBuffers(window);
-}
-
-void Window::prepareToNextFrame() {
-    glfwGetWindowSize(window, &width, &height);
-    glViewport(0, 0, width, height); // resize window
-    glClear(GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT); // clear scene
-
-    camera.setAspect(width, height);
-    camera.updateMatrix();
-    if (SimParams::rotate_camera && !SimParams::pause_all) {
-        camera.rotate();
-    }
-}
-
-void Window::pollEvents() {
-    glfwPollEvents();
-}
-
-void Window::capFrameRate() {
-    volatile double currentTime = glfwGetTime();
-    while ((currentTime - prevFrameTime) < (1.0 / FPS_LOCK)) {
-        currentTime = glfwGetTime();
-        pollEvents();
-    }
-    prevFrameTime = currentTime;
+Window::~Window() {
+    glfwDestroyWindow(window);
 }
 
 void Window::init(int width, int height, const char* title) {
@@ -86,6 +54,26 @@ void Window::init(int width, int height, const char* title) {
     std::clog << "Window initialized\n";
 }
 
-Window::~Window() {
-    glfwDestroyWindow(window);
+int Window::getWidth() { return width; }
+int Window::getHeight() { return height; }
+bool Window::shouldClose() { return glfwWindowShouldClose(window); }
+
+void Window::prepareToNextFrame() {
+    glfwGetWindowSize(window, &width, &height);
+    glViewport(0, 0, width, height); // resize window
+    glClear(GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT); // clear scene
+
+    camera.setAspect(width, height);
+    camera.updateMatrix();
+    if (SimParams::rotate_camera && !SimParams::pause_all) {
+        camera.rotate();
+    }
+}
+
+void Window::swapBuffers() {
+    glfwSwapBuffers(window);
+}
+
+void Window::pollEvents() {
+    glfwPollEvents();
 }

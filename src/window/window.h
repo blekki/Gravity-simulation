@@ -24,21 +24,15 @@ class Window
         // key callback
         static void key_callback(GLFWwindow *window, int key, int scancode, int action, int mods);
 
-        // fps lock feature
-        double prevFrameTime = 0.0f;
-        const double FPS_LOCK = 120.0;
-
     public:
+        ~Window();
+        void init(int width, int height, const char* title);
+        
         int getWidth();
         int getHeight();
+
         bool shouldClose();
-        
-        void swapBuffers();
         void prepareToNextFrame();
+        void swapBuffers();
         void pollEvents();
-        void capFrameRate();    // wait until the frame time comes
-
-        void init(int width, int height, const char* title);
-
-        ~Window();
 };
